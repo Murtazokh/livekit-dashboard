@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Custom component styles can be added here */
+}
