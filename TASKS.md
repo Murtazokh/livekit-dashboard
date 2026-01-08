@@ -49,93 +49,94 @@
 ## Phase 2: Backend API Layer
 
 ### 2.1 Express Server Setup
-- [ ] Create basic Express server (src/server.ts)
-- [ ] Configure CORS middleware
-- [ ] Configure JSON body parser
-- [ ] Add request logging middleware
-- [ ] Set up error handling middleware
-- [ ] Configure environment variable loading
-- [ ] Test server starts successfully
+- [x] Create basic Express server (src/server.ts)
+- [x] Configure CORS middleware
+- [x] Configure JSON body parser
+- [x] Add request logging middleware
+- [x] Set up error handling middleware
+- [x] Configure environment variable loading
+- [x] Test server starts successfully
 
 ### 2.2 LiveKit Service Implementation
-- [ ] Create LiveKitService class (src/services/livekitService.ts)
-- [ ] Implement connection initialization method
-- [ ] Implement listRooms method
-- [ ] Implement getRoomDetails method
-- [ ] Implement listParticipants method
-- [ ] Implement getAgents method (if available in SDK)
-- [ ] Add error handling for API calls
-- [ ] Test service with mock credentials
+- [x] Create LiveKitService class (src/services/livekitService.ts)
+- [x] Implement connection initialization method
+- [x] Implement listRooms method
+- [x] Implement getRoomDetails method
+- [x] Implement listParticipants method
+- [x] Implement getAgents method (if available in SDK)
+- [x] Add error handling for API calls
+- [x] Test service with mock credentials
 
 ### 2.3 API Controllers
-- [ ] Create roomsController with listRooms endpoint handler
-- [ ] Create roomsController with getRoomDetails endpoint handler
-- [ ] Create participantsController with listParticipants endpoint handler
-- [ ] Create agentsController with listAgents endpoint handler
-- [ ] Add input validation for all controllers
-- [ ] Add error responses for all controllers
+- [x] Create roomsController with listRooms endpoint handler
+- [x] Create roomsController with getRoomDetails endpoint handler
+- [x] Create participantsController with listParticipants endpoint handler
+- [x] Create agentsController with listAgents endpoint handler
+- [x] Add input validation for all controllers
+- [x] Add error responses for all controllers
 
 ### 2.4 API Routes
-- [ ] Create main API router (src/routes/api.ts)
-- [ ] Define POST /api/config/validate endpoint
-- [ ] Define GET /api/rooms endpoint
-- [ ] Define GET /api/rooms/:roomName endpoint
-- [ ] Define GET /api/rooms/:roomName/participants endpoint
-- [ ] Define GET /api/agents endpoint
+- [x] Create main API router (src/routes/api.ts)
+- [x] Define POST /api/config/validate endpoint
+- [x] Define GET /api/rooms endpoint
+- [x] Define GET /api/rooms/:roomName endpoint
+- [x] Define GET /api/rooms/:roomName/participants endpoint
+- [x] Define GET /api/rooms/:roomName/agents endpoint
 - [ ] Add route-level middleware for validation
 
 ### 2.5 Middleware
-- [ ] Create validateConfig middleware (checks API credentials in headers)
-- [ ] Create errorHandler middleware (formats errors consistently)
-- [ ] Create requestLogger middleware (logs all requests)
-- [ ] Add rate limiting middleware
-- [ ] Test all middleware functions
+- [x] Create validateConfig middleware (checks API credentials in headers)
+- [x] Create errorHandler middleware (formats errors consistently)
+- [x] Create requestLogger middleware (logs all requests)
+- [x] Add rate limiting middleware
+- [x] Test all middleware functions
 
 ### 2.6 Backend Testing
-- [ ] Test POST /api/config/validate returns success/error
-- [ ] Test GET /api/rooms returns list of rooms
-- [ ] Test GET /api/rooms/:roomName returns room details
-- [ ] Test GET /api/participants returns participants
-- [ ] Test GET /api/agents returns agents
-- [ ] Test error handling for invalid credentials
-- [ ] Test error handling for network failures
+- [x] Test POST /api/config/validate returns success/error
+- [x] Test GET /api/rooms returns list of rooms
+- [x] Test GET /api/rooms/:roomName returns room details
+- [x] Test GET /api/rooms/:roomName/participants returns participants
+- [x] Test GET /api/rooms/:roomName/agents returns agents
+- [x] Test error handling for invalid credentials
+- [x] Test error handling for network failures
 
 ---
 
 ## Phase 3: Configuration & Connection
 
 ### 3.1 Core Port Interfaces
-- [ ] Create ILiveKitService interface (core/ports/)
-- [ ] Create IConfigStorage interface (core/ports/)
-- [ ] Define method signatures for all interfaces
-- [ ] Add JSDoc comments to interfaces
+- [x] Create ILiveKitService interface (core/ports/)
+- [x] Create IConfigStorage interface (core/ports/)
+- [x] Create IRealtimeProvider interface (core/ports/)
+- [x] Define method signatures for all interfaces
+- [x] Add JSDoc comments to interfaces
 
 ### 3.2 Configuration Storage
-- [ ] Create LocalStorageConfig class (infrastructure/storage/)
-- [ ] Implement saveConfig method
-- [ ] Implement loadConfig method
-- [ ] Implement clearConfig method
-- [ ] Add encryption for sensitive data (optional)
-- [ ] Test storage persistence
+- [x] Create LocalStorageConfig class (infrastructure/storage/)
+- [x] Implement saveConfig method
+- [x] Implement loadConfig method
+- [x] Implement clearConfig method
+- [x] Add encryption for sensitive data (optional)
+- [x] Test storage persistence
 
 ### 3.3 API Client Implementation
-- [ ] Create ApiClient class (infrastructure/api/)
-- [ ] Implement validateConnection method
-- [ ] Implement getRooms method
-- [ ] Implement getRoomDetails method
-- [ ] Implement getParticipants method
-- [ ] Implement getAgents method
+- [x] Create ApiClient class (infrastructure/api/)
+- [x] Implement validateConnection method
+- [x] Implement getRooms method
+- [x] Implement getRoomDetails method
+- [x] Implement getParticipants method
+- [x] Implement getAgents method
 - [ ] Add request/response interceptors
 - [ ] Add retry logic for failed requests
-- [ ] Test all API client methods
+- [x] Test all API client methods
 
 ### 3.4 Connection Validation Use Case
-- [ ] Create ValidateConnection use case (core/usecases/)
-- [ ] Implement validation logic
-- [ ] Add error handling for invalid credentials
-- [ ] Add error handling for network issues
-- [ ] Test with valid credentials
-- [ ] Test with invalid credentials
+- [x] Create ValidateConnection use case (core/usecases/)
+- [x] Implement validation logic
+- [x] Add error handling for invalid credentials
+- [x] Add error handling for network issues
+- [x] Test with valid credentials
+- [x] Test with invalid credentials
 
 ### 3.5 Settings Page UI
 - [ ] Create Settings page component (presentation/pages/Settings.tsx)
