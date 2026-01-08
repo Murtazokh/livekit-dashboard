@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import type { ServerConfig } from '@/shared/types/config';
 import type { IConfigStorage } from '@/core/ports/IConfigStorage';
 import { LocalStorageConfig } from '@/infrastructure/storage/LocalStorageConfig';
+import { ApiClient } from '@/infrastructure/api/ApiClient';
 import { ValidateConnection } from '@/core/usecases/ValidateConnection';
-import { useApiClient } from '../providers/ApiClientProvider';
 
 /**
  * Custom hook for managing LiveKit server settings
@@ -23,8 +23,8 @@ export const useSettings = () => {
 
   // Initialize services
   const configStorage: IConfigStorage = new LocalStorageConfig();
-  const { apiClient } = useApiClient();
-  const validateConnection = new ValidateConnection(apiClient);
+  const validationApiClient = new ApiClient();
+  const validateConnection = new ValidateConnection(validationApiClient);
 
   // Load configuration on mount
   useEffect(() => {

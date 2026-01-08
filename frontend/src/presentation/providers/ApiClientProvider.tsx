@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ApiClient } from '@/infrastructure/api/ApiClient';
-import { useSettings } from '../hooks/useSettings';
+import { LocalStorageConfig } from '@/infrastructure/storage/LocalStorageConfig';
+import type { ServerConfig } from '@/shared/types/config';
 
 interface ApiClientContextType {
   apiClient: ApiClient;
@@ -22,12 +23,23 @@ interface ApiClientProviderProps {
 }
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
-  const { config, isConfigComplete } = useSettings();
   const [apiClient] = useState(() => new ApiClient());
   const [isInitialized, setIsInitialized] = useState(false);
+  const [config, setConfig] = useState<ServerConfig | null>(null);
 
+  // Load config on mount
   useEffect(() => {
-    if (isConfigComplete() && config) {
+    const configStorage = new LocalStorageConfig();
+    const loadConfig = async () => {
+      const savedConfig = await configStorage.loadConfig();
+      setConfig(savedConfig);
+    };
+    loadConfig();
+  }, []);
+
+  // Initialize ApiClient when config is available
+  useEffect(() => {
+    if (config) {
       console.log('Initializing ApiClient with config:', {
         serverUrl: config.serverUrl,
         hasApiKey: !!config.apiKey,
@@ -38,7 +50,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     } else {
       setIsInitialized(false);
     }
-  }, [apiClient, config, isConfigComplete]);
+  }, [apiClient, config]);
 
   return (
     <ApiClientContext.Provider value={{ apiClient, isInitialized }}>
