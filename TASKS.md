@@ -162,22 +162,27 @@
 ## Phase 4: Dashboard Core Features
 
 ### 4.1 Rooms Feature - Backend Integration
-- [ ] Create GetRooms use case (core/usecases/)
-- [ ] Implement business logic for rooms
-- [ ] Add filtering/sorting logic if needed
-- [ ] Test use case with mock data
+- [x] Create GetRooms use case (core/usecases/)
+- [x] Implement business logic for rooms
+- [x] Add filtering/sorting logic if needed
+- [x] Test use case with mock data
 
 ### 4.2 Rooms Feature - Data Fetching
-- [ ] Create useRooms hook (presentation/hooks/)
-- [ ] Integrate React Query for data fetching
-- [ ] Configure cache time and stale time
-- [ ] Add refetch on window focus
-- [ ] Add error handling
-- [ ] Test hook with valid config
-- [ ] Test hook with invalid config
+- [x] Create useRooms hook (presentation/hooks/)
+- [x] Integrate React Query for data fetching
+- [x] Configure cache time and stale time
+- [x] Add refetch on window focus
+- [x] Add error handling
+- [x] Test hook with valid config
+- [x] Test hook with invalid config
 
 ### 4.3 Rooms Feature - UI Components
-- [ ] Create RoomList component (presentation/components/rooms/)
+- [x] Create RoomList component (presentation/components/rooms/)
+- [x] Create RoomCard component
+- [x] Add loading skeleton
+- [x] Add empty state
+- [x] Add error state
+- [x] Style components with Tailwind
 - [ ] Create RoomCard component
 - [ ] Add room name, participant count, creation time
 - [ ] Add loading skeleton
