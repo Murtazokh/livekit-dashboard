@@ -33,8 +33,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onClick }) => {
 
   return (
     <div
-      className={`bg-card text-card-foreground rounded-lg border shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer ${
-        onClick ? 'hover:border-ring' : ''
+      className={`bg-card text-card-foreground rounded-xl border shadow-sm p-6 hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer group ${
+        onClick ? 'hover:scale-[1.02]' : ''
       }`}
       onClick={() => onClick?.(room)}
     >
@@ -49,14 +49,16 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onClick }) => {
         </div>
 
         <div className="ml-4 flex-shrink-0">
-          <div className="flex items-center space-x-1">
-            <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M22 2l-4 4"/>
-              <circle cx="18" cy="6" r="1"/>
-            </svg>
-            <span className={`text-sm font-medium ${getParticipantColor(room.numParticipants)}`}>
+          <div className="flex items-center space-x-2">
+            <div className={`p-1.5 rounded-full ${room.numParticipants > 0 ? 'bg-green-500/10' : 'bg-muted'}`}>
+              <svg className={`h-3.5 w-3.5 ${room.numParticipants > 0 ? 'text-green-600' : 'text-muted-foreground'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 2l-4 4"/>
+                <circle cx="18" cy="6" r="1"/>
+              </svg>
+            </div>
+            <span className={`text-sm font-semibold ${getParticipantColor(room.numParticipants)}`}>
               {room.numParticipants}
             </span>
           </div>
@@ -91,12 +93,18 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onClick }) => {
           )}
         </div>
 
-        {room.activeRecording && (
-          <div className="flex items-center space-x-1 text-red-600 dark:text-red-400">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            <span className="text-xs font-medium">Recording</span>
+        <div className="flex items-center space-x-2">
+          {room.activeRecording && (
+            <div className="flex items-center space-x-1 text-red-600 dark:text-red-400">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-xs font-medium">Recording</span>
+            </div>
+          )}
+          <div className="flex items-center space-x-1 text-green-600 dark:text-green-400">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span className="text-xs font-medium">Active</span>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

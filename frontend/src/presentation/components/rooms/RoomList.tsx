@@ -41,7 +41,7 @@ export const RoomList: React.FC<RoomListProps> = ({ onRoomClick, filters }) => {
     return (
       <div className="text-center py-12">
         <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 max-w-md mx-auto">
-          <svg className="h-12 w-12 text-destructive mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="h-8 w-8 text-destructive mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -65,7 +65,7 @@ export const RoomList: React.FC<RoomListProps> = ({ onRoomClick, filters }) => {
     return (
       <div className="text-center py-12">
         <div className="bg-muted/50 rounded-lg p-8 max-w-md mx-auto">
-          <svg className="h-16 w-16 text-muted-foreground mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+          <svg className="h-10 w-10 text-muted-foreground mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="9" y1="9" x2="15" y2="15"></line>
             <line x1="15" y1="9" x2="9" y2="15"></line>

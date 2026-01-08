@@ -47,11 +47,19 @@ export const ServerConfigForm: React.FC<ServerConfigFormProps> = ({
   const isFormValid = config.serverUrl && config.apiKey && config.apiSecret;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold tracking-tight">LiveKit Server Configuration</h2>
-          <p className="text-muted-foreground mt-2">
+        <div className="max-w-2xl mx-auto">
+      <div className="bg-card text-card-foreground rounded-xl border shadow-sm p-8">
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <svg className="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m16.24-3.76l-4.24 4.24m-6-6L2.76 6.24m16.24 12.52l-4.24-4.24m-6 6L2.76 17.76"/>
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">Server Configuration</h2>
+          </div>
+          <p className="text-muted-foreground ml-11">
             Configure your LiveKit server connection details to start monitoring your rooms and participants.
           </p>
         </div>
@@ -62,15 +70,24 @@ export const ServerConfigForm: React.FC<ServerConfigFormProps> = ({
             <label htmlFor="serverUrl" className="text-sm font-medium leading-none">
               Server URL *
             </label>
-            <input
-              id="serverUrl"
-              type="url"
-              placeholder="https://your-livekit-server.com"
-              value={config.serverUrl}
-              onChange={handleInputChange('serverUrl')}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              required
-            />
+            <div className="relative">
+              <input
+                id="serverUrl"
+                type="url"
+                placeholder="https://your-livekit-server.com"
+                value={config.serverUrl}
+                onChange={handleInputChange('serverUrl')}
+                className="flex h-11 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                required
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <path d="M12 17h.01"></path>
+                </svg>
+              </div>
+            </div>
             <p className="text-xs text-muted-foreground">
               The URL of your LiveKit server (e.g., wss://your-project.livekit.cloud or ws://localhost:7880)
             </p>
@@ -81,15 +98,22 @@ export const ServerConfigForm: React.FC<ServerConfigFormProps> = ({
             <label htmlFor="apiKey" className="text-sm font-medium leading-none">
               API Key *
             </label>
-            <input
-              id="apiKey"
-              type="password"
-              placeholder="your-api-key"
-              value={config.apiKey}
-              onChange={handleInputChange('apiKey')}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              required
-            />
+            <div className="relative">
+              <input
+                id="apiKey"
+                type="password"
+                placeholder="your-api-key"
+                value={config.apiKey}
+                onChange={handleInputChange('apiKey')}
+                className="flex h-11 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors pr-10"
+                required
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+              </div>
+            </div>
             <p className="text-xs text-muted-foreground">
               Your LiveKit API key for server authentication
             </p>
@@ -100,15 +124,22 @@ export const ServerConfigForm: React.FC<ServerConfigFormProps> = ({
             <label htmlFor="apiSecret" className="text-sm font-medium leading-none">
               API Secret *
             </label>
-            <input
-              id="apiSecret"
-              type="password"
-              placeholder="your-api-secret"
-              value={config.apiSecret}
-              onChange={handleInputChange('apiSecret')}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              required
-            />
+            <div className="relative">
+              <input
+                id="apiSecret"
+                type="password"
+                placeholder="your-api-secret"
+                value={config.apiSecret}
+                onChange={handleInputChange('apiSecret')}
+                className="flex h-11 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors pr-10"
+                required
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
             <p className="text-xs text-muted-foreground">
               Your LiveKit API secret for server authentication
             </p>
@@ -145,7 +176,7 @@ export const ServerConfigForm: React.FC<ServerConfigFormProps> = ({
             <button
               type="submit"
               disabled={!isFormValid || isSaving}
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-colors"
             >
               {isSaving ? (
                 <>
@@ -176,7 +207,7 @@ export const ServerConfigForm: React.FC<ServerConfigFormProps> = ({
               type="button"
               onClick={handleTestConnection}
               disabled={!isFormValid || isValidating}
-              className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-colors"
             >
               {isValidating ? (
                 <>

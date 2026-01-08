@@ -29,7 +29,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
             </p>
             <div className="bg-card rounded-lg border shadow-sm p-8 max-w-2xl mx-auto">
               <div className="text-center">
-                <svg className="h-16 w-16 mx-auto text-muted-foreground mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <svg className="h-12 w-12 mx-auto text-muted-foreground mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                   <circle cx="12" cy="12" r="3"></circle>
                   <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m16.24-3.76l-4.24 4.24m-6-6L2.76 6.24m16.24 12.52l-4.24-4.24m-6 6L2.76 17.76"/>
                 </svg>
@@ -63,42 +63,48 @@ export const Dashboard: React.FC<DashboardProps> = () => {
 
         {/* Metrics Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
-            <div className="flex items-center">
-              <svg className="h-8 w-8 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-              </svg>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Total Rooms</p>
-                <p className="text-2xl font-bold">--</p>
+          <div className="bg-card text-card-foreground rounded-xl border shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Total Rooms</p>
+                <p className="text-3xl font-bold text-primary">--</p>
+              </div>
+              <div className="p-3 bg-primary/10 rounded-full">
+                <svg className="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
-            <div className="flex items-center">
-              <svg className="h-8 w-8 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Active Participants</p>
-                <p className="text-2xl font-bold">--</p>
+          <div className="bg-card text-card-foreground rounded-xl border shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Active Participants</p>
+                <p className="text-3xl font-bold text-green-600">--</p>
+              </div>
+              <div className="p-3 bg-green-500/10 rounded-full">
+                <svg className="h-6 w-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
-            <div className="flex items-center">
-              <svg className="h-8 w-8 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="23 7 16 12 23 17 23 7"/>
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-              </svg>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Active Streams</p>
-                <p className="text-2xl font-bold">--</p>
+          <div className="bg-card text-card-foreground rounded-xl border shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Active Streams</p>
+                <p className="text-3xl font-bold text-blue-600">--</p>
+              </div>
+              <div className="p-3 bg-blue-500/10 rounded-full">
+                <svg className="h-6 w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polygon points="23 7 16 12 23 17 23 7"/>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
               </div>
             </div>
           </div>
