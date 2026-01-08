@@ -1,6 +1,7 @@
 import React from 'react';
 import { RoomCard } from './RoomCard';
 import { useRooms } from '../../hooks/useRooms';
+import { LoadingSpinner } from '../ui/LoadingSpinner';
 import type { Room } from '@/core/domain/Room';
 
 interface RoomListProps {
@@ -17,22 +18,11 @@ export const RoomList: React.FC<RoomListProps> = ({ onRoomClick, filters }) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-card rounded-lg border shadow-sm p-6 animate-pulse">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 space-y-2">
-                <div className="h-5 bg-muted rounded w-3/4"></div>
-                <div className="h-4 bg-muted rounded w-1/2"></div>
-              </div>
-              <div className="h-6 w-12 bg-muted rounded"></div>
-            </div>
-            <div className="mt-4 flex space-x-4">
-              <div className="h-4 bg-muted rounded w-20"></div>
-              <div className="h-4 bg-muted rounded w-16"></div>
-            </div>
-          </div>
-        ))}
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <LoadingSpinner size="lg" className="mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading rooms...</p>
+        </div>
       </div>
     );
   }

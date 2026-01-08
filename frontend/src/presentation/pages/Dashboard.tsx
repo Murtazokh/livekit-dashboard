@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RoomList } from '../components/rooms/RoomList';
 import { useSettings } from '../hooks/useSettings';
+import { StatusBadge } from '../components/ui/StatusBadge';
 import type { Room } from '@/core/domain/Room';
 
 interface DashboardProps {}
@@ -53,16 +54,17 @@ export const Dashboard: React.FC<DashboardProps> = () => {
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="container mx-auto px-4">
-        <div className="mb-8">
+      <div className="container mx-auto px-4 fade-in">
+        <div className="mb-8 slide-up">
           <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-2">
             Monitor your LiveKit rooms and real-time communication infrastructure
           </p>
         </div>
 
+
         {/* Metrics Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="bg-card text-card-foreground rounded-xl border shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -111,15 +113,12 @@ export const Dashboard: React.FC<DashboardProps> = () => {
         </div>
 
         {/* Rooms Section */}
-        <div className="mb-8">
+        <div className="mb-8 slide-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold tracking-tight">Active Rooms</h2>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Live</span>
-              </div>
-            </div>
+            <StatusBadge status="active" size="sm">
+              Live
+            </StatusBadge>
           </div>
 
           <RoomList onRoomClick={handleRoomClick} />

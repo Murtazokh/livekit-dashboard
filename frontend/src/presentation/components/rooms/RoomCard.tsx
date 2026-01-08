@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Room } from '@/core/domain/Room';
+import { StatusBadge } from '../ui/StatusBadge';
 
 interface RoomCardProps {
   room: Room;
@@ -95,15 +96,13 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onClick }) => {
 
         <div className="flex items-center space-x-2">
           {room.activeRecording && (
-            <div className="flex items-center space-x-1 text-red-600 dark:text-red-400">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium">Recording</span>
-            </div>
+            <StatusBadge status="error" size="sm">
+              Recording
+            </StatusBadge>
           )}
-          <div className="flex items-center space-x-1 text-green-600 dark:text-green-400">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-xs font-medium">Active</span>
-          </div>
+          <StatusBadge status="active" size="sm">
+            Active
+          </StatusBadge>
         </div>
       </div>
     </div>
