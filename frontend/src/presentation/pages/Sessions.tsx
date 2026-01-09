@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRooms } from '../hooks/useRooms';
 import { DataTable, TableSkeleton } from '../components/table';
 import type { Column } from '../components/table';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
+import { FilterBar, TimeRange } from '../components/filters';
 import type { Room } from '@/core/domain/Room';
 
 /**
@@ -13,6 +14,9 @@ import type { Room } from '@/core/domain/Room';
 export const Sessions: React.FC = () => {
   const { data: rooms, isLoading, error, refetch, isFetching, dataUpdatedAt } = useRooms();
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [searchValue, setSearchValue] = useState('');
+  const [timeRange, setTimeRange] = useState<TimeRange>('last_24_hours');
+  const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState(true);
 
   // Update last updated time when data changes
   useEffect(() => {
@@ -20,6 +24,28 @@ export const Sessions: React.FC = () => {
       setLastUpdated(new Date(dataUpdatedAt));
     }
   }, [dataUpdatedAt]);
+
+  // Filter rooms based on search value
+  const filteredRooms = useMemo(() => {
+    if (!rooms) return [];
+
+    return rooms.filter((room) => {
+      // Search filter
+      if (searchValue) {
+        const searchLower = searchValue.toLowerCase();
+        const matchesSearch =
+          room.name.toLowerCase().includes(searchLower) ||
+          room.sid.toLowerCase().includes(searchLower);
+
+        if (!matchesSearch) return false;
+      }
+
+      // Time range filter (TODO: implement when we have creation time filtering)
+      // Currently showing all rooms as we don't have historical data
+
+      return true;
+    });
+  }, [rooms, searchValue, timeRange]);
 
   // Format duration from creation time to now
   const formatDuration = (creationTime: number): string => {
@@ -188,6 +214,19 @@ export const Sessions: React.FC = () => {
         <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
       </div>
 
+      {/* Filter Bar */}
+      <FilterBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        timeRange={timeRange}
+        onTimeRangeChange={setTimeRange}
+        isAutoRefreshEnabled={isAutoRefreshEnabled}
+        onAutoRefreshToggle={() => setIsAutoRefreshEnabled(!isAutoRefreshEnabled)}
+        onRefresh={() => refetch()}
+        isRefreshing={isFetching}
+        className="mb-6"
+      />
+
       {isLoading ? (
         <TableSkeleton
           columns={columns.map((col) => ({ label: col.label, align: col.align }))}
@@ -195,11 +234,15 @@ export const Sessions: React.FC = () => {
         />
       ) : (
         <DataTable
-          data={rooms || []}
+          data={filteredRooms}
           columns={columns}
           keyExtractor={(room) => room.sid}
           onRowClick={handleRowClick}
-          emptyMessage="No active sessions. Start a room to see it appear here."
+          emptyMessage={
+            searchValue
+              ? `No sessions found matching "${searchValue}"`
+              : "No active sessions. Start a room to see it appear here."
+          }
         />
       )}
     </PageContainer>

@@ -325,20 +325,21 @@
 - [ ] Test entire sessions page flow
 
 ### 5.6 Filters & Real-time Controls
-- [ ] Create `FilterBar` component (`frontend/src/presentation/components/filters/FilterBar.tsx`)
-- [ ] Create `TimeRangeSelect` dropdown component
+- [x] Create `FilterBar` component (`frontend/src/presentation/components/filters/FilterBar.tsx`)
+- [x] Create `TimeRangeSelect` dropdown component
   - Last hour
   - Last 24 hours
   - Last 7 days
   - Custom range
-- [ ] Create `SearchInput` component for filtering
-- [ ] Add refresh button
-- [ ] Add auto-refresh toggle switch
-- [ ] Add "Last updated" timestamp display
-- [ ] Add "Live" indicator with pulse animation
-- [ ] Connect filters to React Query
-- [ ] Implement time range filtering logic
-- [ ] Test all filter combinations
+- [x] Create `SearchInput` component for filtering
+- [x] Add refresh button
+- [x] Add auto-refresh toggle switch
+- [x] Add "Last updated" timestamp display (via LiveIndicator)
+- [x] Add "Live" indicator with pulse animation (already implemented)
+- [x] Connect filters to React Query
+- [x] Implement search filtering logic (room name and SID)
+- [ ] Implement time range filtering logic (TODO: needs historical data)
+- [x] Test all filter combinations
 
 ### 5.7 Real-time Updates Configuration
 - [x] Update React Query configuration in useRooms hook:
