@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRooms } from '../hooks/useRooms';
 import { DataTable, TableSkeleton } from '../components/table';
 import type { Column } from '../components/table';
 import { StatusBadge } from '../components/ui/StatusBadge';
+import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
 import type { Room } from '@/core/domain/Room';
 
@@ -10,7 +11,15 @@ import type { Room } from '@/core/domain/Room';
  * Sessions page with data table matching LiveKit Cloud Dashboard
  */
 export const Sessions: React.FC = () => {
-  const { data: rooms, isLoading, error, refetch } = useRooms();
+  const { data: rooms, isLoading, error, refetch, isFetching, dataUpdatedAt } = useRooms();
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Update last updated time when data changes
+  useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdated(new Date(dataUpdatedAt));
+    }
+  }, [dataUpdatedAt]);
 
   // Format duration from creation time to now
   const formatDuration = (creationTime: number): string => {
@@ -168,6 +177,17 @@ export const Sessions: React.FC = () => {
 
   return (
     <PageContainer>
+      {/* Header with Live Indicator */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold">Sessions</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Real-time view of all active and completed sessions
+          </p>
+        </div>
+        <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
+      </div>
+
       {isLoading ? (
         <TableSkeleton
           columns={columns.map((col) => ({ label: col.label, align: col.align }))}

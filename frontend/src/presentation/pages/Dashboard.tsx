@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RoomList } from '../components/rooms/RoomList';
 import { useSettings } from '../hooks/useSettings';
 import { useRooms } from '../hooks/useRooms';
 import { StatusBadge } from '../components/ui/StatusBadge';
+import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
 import type { Room } from '@/core/domain/Room';
 
@@ -13,8 +14,16 @@ interface DashboardProps {}
  */
 export const Dashboard: React.FC<DashboardProps> = () => {
   const { isConfigComplete } = useSettings();
-  const { data: rooms } = useRooms();
+  const { data: rooms, isFetching, isLoading, dataUpdatedAt } = useRooms();
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Update last updated time when data changes
+  useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdated(new Date(dataUpdatedAt));
+    }
+  }, [dataUpdatedAt]);
 
   const handleRoomClick = (room: Room) => {
     setSelectedRoom(room);
@@ -109,9 +118,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Active Rooms</h2>
-            <StatusBadge status="active" size="sm">
-              Live
-            </StatusBadge>
+            <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
           </div>
 
           <RoomList onRoomClick={handleRoomClick} />

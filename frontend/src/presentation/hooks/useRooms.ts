@@ -32,10 +32,12 @@ export const useRooms = (filters?: any) => {
       return getRooms.execute();
     },
     enabled: isConfigComplete() && isInitialized, // Only run query if configuration is complete and API client is initialized
-    staleTime: 30000, // Consider data fresh for 30 seconds
+    staleTime: 0, // Always consider data stale for real-time updates
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
     refetchOnWindowFocus: true, // Refetch when window regains focus
-    refetchInterval: 60000, // Refetch every minute for real-time feel
+    refetchOnReconnect: true, // Refetch when reconnecting to network
+    refetchInterval: 5000, // Refetch every 5 seconds for real-time updates
+    refetchIntervalInBackground: false, // Pause polling when tab is not visible
     retry: (failureCount, error) => {
       // Don't retry on 4xx errors (client errors)
       if (error instanceof Error && error.message.includes('4')) {

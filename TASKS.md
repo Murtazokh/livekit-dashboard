@@ -340,16 +340,16 @@
 - [ ] Test all filter combinations
 
 ### 5.7 Real-time Updates Configuration
-- [ ] Update React Query configuration in useRooms hook:
+- [x] Update React Query configuration in useRooms hook:
   - Set refetchInterval: 5000 (5 seconds)
   - Ensure refetchOnWindowFocus: true
   - Ensure refetchOnReconnect: true
-- [ ] Add visual feedback during data refresh
+- [x] Add visual feedback during data refresh
 - [ ] Implement optimistic UI updates
 - [ ] Add toast notifications for new rooms (optional)
-- [ ] Create `LiveIndicator` component with pulse animation
-- [ ] Test real-time updates work without page refresh
-- [ ] Verify no excessive API calls
+- [x] Create `LiveIndicator` component with pulse animation
+- [x] Test real-time updates work without page refresh
+- [x] Verify no excessive API calls (pauses when tab not visible)
 
 ### 5.8 Status & Feature Badges
 - [ ] Update `StatusBadge` component to match LiveKit Cloud style
