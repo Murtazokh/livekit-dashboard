@@ -302,15 +302,16 @@
 - [ ] Test table with various data scenarios
 
 ### 5.4 Metric Cards with Visualizations
-- [ ] Create `MetricCard` component (`frontend/src/presentation/components/metrics/MetricCard.tsx`)
-- [ ] Create `MiniChart` component for sparkline visualizations
-- [ ] Implement "Unique participants" metric card
-- [ ] Implement "Total rooms" metric card
-- [ ] Calculate real metrics from rooms data
-- [ ] Add metric card loading skeletons
-- [ ] Add subtle hover animations
-- [ ] Create mock trend data for charts (or calculate from API)
-- [ ] Test metric cards responsiveness
+- [x] Create `MetricCard` component (`frontend/src/presentation/components/metrics/MetricCard.tsx`)
+- [x] Create `MiniChart` component for sparkline visualizations
+- [x] Implement "Total rooms" metric card
+- [x] Implement "Active participants" metric card
+- [x] Implement "Active publishers" metric card
+- [x] Calculate real metrics from rooms data
+- [x] Add subtle hover animations
+- [x] Create mock trend data for charts (or calculate from API)
+- [x] Test metric cards responsiveness
+- [x] Add trend indicators (up/down arrows with percentages)
 
 ### 5.5 Sessions Page (Dashboard Replacement)
 - [ ] Rename Dashboard.tsx to Sessions.tsx or create new Sessions page
@@ -735,6 +736,166 @@
 - [ ] Share on social media
 - [ ] Post on relevant communities (Reddit, HN, etc.)
 - [ ] Monitor issues and feedback
+
+---
+
+## Phase 12: Real-time Transcription Feature
+
+> **Reference**: See TRANSCRIPTION_RESEARCH.md for detailed research and implementation approaches
+> **Goal**: Display real-time agent and user transcriptions in the dashboard (like LiveKit Cloud Dashboard)
+
+### 12.1 Phase 1 - Basic Real-time Display (No Storage)
+
+**Effort**: Low (2-3 hours) | **Priority**: Medium | **Value**: Medium
+
+- [ ] Add livekit-client SDK to frontend dependencies
+- [ ] Create `useTranscription` hook (`frontend/src/presentation/hooks/useTranscription.ts`)
+  - Subscribe to RoomEvent.TranscriptionReceived
+  - Handle interim and final transcription segments
+  - Track transcriptions by participant
+- [ ] Create `TranscriptionPanel` component (`frontend/src/presentation/components/transcription/TranscriptionPanel.tsx`)
+  - Display transcriptions in real-time during active sessions
+  - Show participant identity and timestamp
+  - Distinguish between interim and final transcriptions
+  - Auto-scroll to latest transcription
+- [ ] Create `TranscriptionSegment` component for individual transcription entries
+- [ ] Add transcription panel to session details view or as sidebar
+- [ ] Style components to match dark theme
+- [ ] Test with live room that has transcription enabled
+- [ ] Test interim vs final transcription updates
+- [ ] Add empty state when no transcriptions available
+- [ ] Add loading state while connecting to room
+
+**Note**: This phase provides real-time visibility but transcriptions disappear when session ends. No historical data.
+
+### 12.2 Phase 2 - Backend Storage & Historical Transcriptions
+
+**Effort**: Medium (5-8 hours) | **Priority**: High | **Value**: High
+
+#### 12.2.1 Database Schema
+- [ ] Add transcriptions table migration to database
+  - Columns: id, room_sid, room_name, participant_id, track_id, segment_id, text, is_final, is_agent, timestamp, created_at
+  - Add indexes: room_sid, room_name, participant_id, timestamp
+- [ ] Run database migration
+- [ ] Test database schema creation
+
+#### 12.2.2 Backend API Implementation
+- [ ] Create transcription model/type (`backend/src/types/transcription.ts`)
+- [ ] Create TranscriptionService (`backend/src/services/transcriptionService.ts`)
+  - Implement saveTranscription method
+  - Implement getTranscriptionsByRoom method
+  - Implement getTranscriptionsBySession method
+  - Add pagination support
+  - Add filtering by participant
+- [ ] Create transcriptionController (`backend/src/controllers/transcriptionController.ts`)
+  - POST /api/transcriptions - store transcription
+  - GET /api/rooms/:roomName/transcriptions - get room transcriptions
+  - GET /api/sessions/:sessionId/transcriptions - get session transcriptions
+  - Add input validation
+- [ ] Add transcription routes to API router
+- [ ] Test API endpoints with Postman/Thunder Client
+
+#### 12.2.3 Frontend Storage Integration
+- [ ] Update `useTranscription` hook to send transcriptions to backend
+  - POST transcription data on TranscriptionReceived event
+  - Handle API errors gracefully
+  - Implement retry logic for failed saves
+- [ ] Create `useTranscriptionHistory` hook for fetching historical data
+  - Integrate React Query for caching
+  - Add pagination support
+  - Add filtering options
+- [ ] Update `TranscriptionPanel` to show historical data when viewing past sessions
+- [ ] Add loading states for fetching history
+- [ ] Add error handling for failed fetches
+- [ ] Test end-to-end storage and retrieval flow
+
+#### 12.2.4 UI Enhancements
+- [ ] Add transcription history view to Sessions page
+- [ ] Create `TranscriptionTimeline` component for chronological view
+- [ ] Add participant filter for transcriptions
+- [ ] Add search functionality within transcriptions
+- [ ] Add "Show only final" toggle
+- [ ] Test historical transcription display
+- [ ] Test filtering and search functionality
+
+### 12.3 Phase 3 - Advanced Transcription Features
+
+**Effort**: High (10-15 hours) | **Priority**: Low | **Value**: Very High
+
+#### 12.3.1 Export & Download
+- [ ] Create `TranscriptionExporter` utility class
+  - Implement exportToTXT method
+  - Implement exportToJSON method
+  - Implement exportToSRT method (with timestamps)
+  - Implement exportToVTT method (WebVTT format)
+- [ ] Add export buttons to TranscriptionPanel
+- [ ] Implement file download functionality
+- [ ] Add export format selector dropdown
+- [ ] Test all export formats
+- [ ] Verify exported file formatting
+
+#### 12.3.2 Search & Analytics
+- [ ] Implement full-text search in transcriptions
+  - Add search index to database (if needed)
+  - Create search API endpoint
+  - Add search UI component
+- [ ] Create transcription analytics dashboard
+  - Calculate total speaking time per participant
+  - Identify most active speakers
+  - Generate word clouds (optional)
+- [ ] Add keyword highlighting in search results
+- [ ] Test search performance with large datasets
+
+#### 12.3.3 Agent Integration Metadata
+- [ ] Extend transcription model to include agent metadata
+  - Agent ID
+  - Agent type (STT provider: Deepgram, AssemblyAI, etc.)
+  - Confidence score
+  - Language detected
+- [ ] Update API to store and retrieve metadata
+- [ ] Display metadata in transcription UI
+- [ ] Add filters by agent type
+- [ ] Test metadata display and filtering
+
+#### 12.3.4 Real-time Syncing & Playback
+- [ ] Create audio playback component with transcription sync
+  - Highlight current transcription segment during playback
+  - Click transcription to jump to audio timestamp
+- [ ] Integrate with LiveKit Egress recordings (if available)
+- [ ] Add play/pause controls
+- [ ] Add playback speed controls
+- [ ] Test audio-transcription synchronization
+
+#### 12.3.5 Speaker Identification Enhancement
+- [ ] Implement speaker diarization display
+- [ ] Add participant avatars to transcription segments
+- [ ] Color-code transcriptions by speaker
+- [ ] Test speaker identification accuracy
+
+#### 12.3.6 Performance Optimization
+- [ ] Implement virtual scrolling for long transcription lists
+- [ ] Add pagination for historical transcriptions
+- [ ] Optimize database queries with proper indexing
+- [ ] Add caching layer for frequently accessed transcriptions
+- [ ] Test performance with 1000+ transcription segments
+- [ ] Optimize bundle size (code splitting if needed)
+
+### 12.4 Phase 4 - WebSocket Proxy Bot (Optional Advanced)
+
+**Effort**: High (8-12 hours) | **Priority**: Low | **Value**: Medium
+
+- [ ] Create background service for transcription capture bot
+- [ ] Implement bot participant management
+  - Generate bot access tokens
+  - Connect bot to rooms automatically
+  - Handle bot lifecycle (connect/disconnect)
+- [ ] Set up bot as systemd service or Docker container
+- [ ] Add bot monitoring and health checks
+- [ ] Configure bot to capture all room transcriptions
+- [ ] Test bot reliability and reconnection
+- [ ] Document bot deployment process
+
+**Note**: This approach ensures transcriptions are captured even when no frontend clients are active. Useful for guaranteed data collection.
 
 ---
 

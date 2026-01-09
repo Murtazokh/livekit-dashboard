@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { RoomList } from '../components/rooms/RoomList';
 import { useSettings } from '../hooks/useSettings';
 import { useRooms } from '../hooks/useRooms';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
+import { MetricCard, MiniChart } from '../components/metrics';
 import type { Room } from '@/core/domain/Room';
 
 interface DashboardProps {}
@@ -34,6 +35,20 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   const totalRooms = rooms?.length || 0;
   const totalParticipants = rooms?.reduce((sum, room) => sum + room.numParticipants, 0) || 0;
   const totalPublishers = rooms?.reduce((sum, room) => sum + (room.numPublishers || 0), 0) || 0;
+
+  // Generate mock trend data for demonstration
+  // TODO: Replace with real historical data from API
+  const roomsTrendData = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 10) + 1);
+  }, []);
+
+  const participantsTrendData = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 20) + 5);
+  }, []);
+
+  const publishersTrendData = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 8) + 1);
+  }, []);
 
   if (!isConfigComplete()) {
     return (
@@ -67,51 +82,69 @@ export const Dashboard: React.FC<DashboardProps> = () => {
 
         {/* Metrics Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card text-card-foreground rounded-lg border p-6 hover:border-primary/50 transition-colors">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wide">Total Rooms</p>
-                <p className="text-3xl font-bold">{totalRooms}</p>
-              </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="9" y1="9" x2="15" y2="15"></line>
-                  <line x1="15" y1="9" x2="9" y2="15"></line>
-                </svg>
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Total Rooms"
+            value={totalRooms}
+            icon={
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+              </svg>
+            }
+            iconColor="text-primary"
+            trend={{ value: 12, isPositive: true }}
+            chart={
+              <MiniChart
+                data={roomsTrendData}
+                color="hsl(var(--primary))"
+                width={120}
+                height={32}
+              />
+            }
+          />
 
-          <div className="bg-card text-card-foreground rounded-lg border p-6 hover:border-success/50 transition-colors">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wide">Active Participants</p>
-                <p className="text-3xl font-bold text-success">{totalParticipants}</p>
-              </div>
-              <div className="p-3 bg-success/10 rounded-lg">
-                <svg className="h-5 w-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                </svg>
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Active Participants"
+            value={totalParticipants}
+            icon={
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+            }
+            iconColor="text-success"
+            trend={{ value: 8, isPositive: true }}
+            chart={
+              <MiniChart
+                data={participantsTrendData}
+                color="hsl(var(--success))"
+                width={120}
+                height={32}
+              />
+            }
+          />
 
-          <div className="bg-card text-card-foreground rounded-lg border p-6 hover:border-info/50 transition-colors">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wide">Active Publishers</p>
-                <p className="text-3xl font-bold text-info">{totalPublishers}</p>
-              </div>
-              <div className="p-3 bg-info/10 rounded-lg">
-                <svg className="h-5 w-5 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="23 7 16 12 23 17 23 7"/>
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Active Publishers"
+            value={totalPublishers}
+            icon={
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="23 7 16 12 23 17 23 7"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+            }
+            iconColor="text-info"
+            trend={{ value: 5, isPositive: false }}
+            chart={
+              <MiniChart
+                data={publishersTrendData}
+                color="hsl(var(--info))"
+                width={120}
+                height={32}
+              />
+            }
+          />
         </div>
 
         {/* Rooms Section */}
