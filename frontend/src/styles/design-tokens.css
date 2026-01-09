@@ -1,9 +1,8 @@
-/* Tailwind CSS v4 imports */
-@import "tailwindcss";
-
 /**
  * LiveKit Dashboard Design System
- * Dark theme matching LiveKit Cloud Dashboard
+ * Inspired by LiveKit Cloud Dashboard
+ *
+ * Color palette matches the professional dark theme with pure black background
  */
 
 @layer base {
@@ -162,8 +161,9 @@
   }
 }
 
-/* Utility classes */
+/* Utility classes for common patterns */
 @layer utilities {
+  /* Text colors */
   .text-muted {
     color: hsl(var(--muted-foreground));
   }
@@ -180,10 +180,12 @@
     color: hsl(var(--destructive));
   }
 
+  /* Background colors */
   .bg-card-hover {
     background-color: hsl(var(--card-hover));
   }
 
+  /* Transitions */
   .transition-fast {
     transition-duration: var(--transition-fast);
   }

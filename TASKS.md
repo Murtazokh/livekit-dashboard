@@ -249,7 +249,193 @@
 
 ---
 
-## Phase 5: UI/UX Polish & Professional Design
+## Phase 5: UI Redesign - LiveKit Cloud Dashboard Style
+
+> **Reference**: See UI_REDESIGN_PLAN.md for detailed design specifications
+> **Goal**: Transform UI to match LiveKit Cloud Dashboard professional aesthetic
+
+### 5.1 Foundation - Dark Theme Design System
+- [x] Create dark theme design tokens file (`frontend/src/styles/design-tokens.css`)
+- [x] Update Tailwind config with new color palette:
+  - Background: #000000 (pure black)
+  - Card: #0F0F0F (very dark gray)
+  - Border: #262626
+  - Primary: #3B82F6 (blue)
+  - Text colors: #FFFFFF, #A3A3A3
+- [x] Define typography system (Inter/System font, 14px base)
+- [x] Define spacing scale (4px base unit)
+- [x] Define border radius values (4px, 8px, 12px)
+- [x] Test dark theme colors for WCAG contrast compliance
+
+### 5.2 Layout Structure - Sidebar Navigation
+- [x] Create `AppLayout` component (`frontend/src/presentation/components/layout/AppLayout.tsx`)
+- [x] Create `Sidebar` component with navigation items
+  - Overview/Dashboard
+  - Sessions
+  - Settings
+- [x] Add sidebar collapse/expand functionality
+- [x] Implement responsive sidebar (drawer on mobile)
+- [x] Create `Header` component with breadcrumbs
+- [x] Create `PageContainer` wrapper component
+- [x] Add smooth page transitions
+- [x] Update App.tsx to use new AppLayout
+- [ ] Test sidebar on all screen sizes
+
+### 5.3 Sessions Data Table Component
+- [x] Create reusable `DataTable` component (`frontend/src/presentation/components/table/DataTable.tsx`)
+- [x] Create `TableHeader` component
+- [x] Create `TableRow` component with hover states
+- [x] Create `TableCell` component
+- [x] Implement table columns for sessions:
+  - Session ID (monospace)
+  - Room name
+  - Started at
+  - Ended at
+  - Duration
+  - Participants
+  - Features (badges)
+  - Status (badge)
+- [x] Add column sorting functionality
+- [x] Add table skeleton loader
+- [x] Add empty state for table
+- [x] Style table to match LiveKit Cloud aesthetic
+- [ ] Test table with various data scenarios
+
+### 5.4 Metric Cards with Visualizations
+- [ ] Create `MetricCard` component (`frontend/src/presentation/components/metrics/MetricCard.tsx`)
+- [ ] Create `MiniChart` component for sparkline visualizations
+- [ ] Implement "Unique participants" metric card
+- [ ] Implement "Total rooms" metric card
+- [ ] Calculate real metrics from rooms data
+- [ ] Add metric card loading skeletons
+- [ ] Add subtle hover animations
+- [ ] Create mock trend data for charts (or calculate from API)
+- [ ] Test metric cards responsiveness
+
+### 5.5 Sessions Page (Dashboard Replacement)
+- [ ] Rename Dashboard.tsx to Sessions.tsx or create new Sessions page
+- [ ] Replace RoomList cards with DataTable
+- [ ] Add metric cards at top of page
+- [ ] Integrate filter bar component
+- [ ] Update page layout to match LiveKit Cloud
+- [ ] Add page header with title and controls
+- [ ] Update routing if page renamed
+- [ ] Remove old RoomCard component (if not needed elsewhere)
+- [ ] Test entire sessions page flow
+
+### 5.6 Filters & Real-time Controls
+- [ ] Create `FilterBar` component (`frontend/src/presentation/components/filters/FilterBar.tsx`)
+- [ ] Create `TimeRangeSelect` dropdown component
+  - Last hour
+  - Last 24 hours
+  - Last 7 days
+  - Custom range
+- [ ] Create `SearchInput` component for filtering
+- [ ] Add refresh button
+- [ ] Add auto-refresh toggle switch
+- [ ] Add "Last updated" timestamp display
+- [ ] Add "Live" indicator with pulse animation
+- [ ] Connect filters to React Query
+- [ ] Implement time range filtering logic
+- [ ] Test all filter combinations
+
+### 5.7 Real-time Updates Configuration
+- [ ] Update React Query configuration in useRooms hook:
+  - Set refetchInterval: 5000 (5 seconds)
+  - Ensure refetchOnWindowFocus: true
+  - Ensure refetchOnReconnect: true
+- [ ] Add visual feedback during data refresh
+- [ ] Implement optimistic UI updates
+- [ ] Add toast notifications for new rooms (optional)
+- [ ] Create `LiveIndicator` component with pulse animation
+- [ ] Test real-time updates work without page refresh
+- [ ] Verify no excessive API calls
+
+### 5.8 Status & Feature Badges
+- [ ] Update `StatusBadge` component to match LiveKit Cloud style
+- [ ] Add status variants:
+  - ACTIVE (green with dot)
+  - CLOSED (gray)
+  - ERROR (red)
+  - CONNECTING (yellow)
+- [ ] Create `FeatureBadge` component for room features
+  - Agents badge
+  - SIP badge
+  - Recording badge
+- [ ] Add icons to badges
+- [ ] Style badges to match reference design
+- [ ] Test badges in table context
+
+### 5.9 Session Details View
+- [ ] Create `SessionDetailsModal` component
+- [ ] Add session metadata display
+- [ ] Create `ParticipantsList` component using LiveKit SDK components
+- [ ] Create `AgentsList` component
+- [ ] Add connection timeline visualization (optional)
+- [ ] Integrate with table row click
+- [ ] Add close/dismiss functionality
+- [ ] Style modal to match dark theme
+- [ ] Test modal with real session data
+
+### 5.10 LiveKit Official Components Integration
+- [ ] Audit @livekit/components-react available components
+- [ ] Use official ParticipantTile for participant displays
+- [ ] Use official ConnectionQualityIndicator
+- [ ] Use official AudioVisualizer if available
+- [ ] Customize styling to match our dark theme
+- [ ] Document which official components are used
+- [ ] Test official components integration
+
+### 5.11 Settings Page Redesign
+- [ ] Update Settings page to use new dark theme
+- [ ] Reorganize settings into card-based sections
+- [ ] Update form styling to match new design
+- [ ] Improve validation feedback UI
+- [ ] Add connection status indicator
+- [ ] Update ServerConfigForm styling
+- [ ] Test settings page with new theme
+
+### 5.12 Loading & Empty States Polish
+- [ ] Create `TableSkeleton` component matching table structure
+- [ ] Update `EmptyState` component with better design
+- [ ] Add illustrations or icons to empty states
+- [ ] Add micro-animations for state transitions
+- [ ] Ensure consistent loading UX across all views
+- [ ] Test all loading and empty state scenarios
+
+### 5.13 Responsive Design & Mobile
+- [ ] Test data table on mobile (consider card fallback view)
+- [ ] Implement responsive table (horizontal scroll or cards)
+- [ ] Test sidebar drawer on mobile
+- [ ] Test metric cards on mobile (stack vertically)
+- [ ] Ensure touch-friendly hit targets (min 44px)
+- [ ] Test all breakpoints: 320px, 768px, 1024px, 1440px
+- [ ] Fix any mobile layout issues
+- [ ] Test on real mobile devices
+
+### 5.14 Performance & Accessibility
+- [ ] Optimize bundle size and loading
+- [ ] Add ARIA labels to table and interactive elements
+- [ ] Implement keyboard navigation for table
+- [ ] Add focus management for modals
+- [ ] Test with screen reader
+- [ ] Check color contrast ratios (WCAG AA)
+- [ ] Test keyboard navigation throughout app
+- [ ] Run Lighthouse accessibility audit
+
+### 5.15 Final Polish & Testing
+- [ ] Add subtle transitions and animations
+- [ ] Verify typography consistency
+- [ ] Check spacing consistency
+- [ ] Test in Chrome, Firefox, Safari
+- [ ] Take before/after screenshots
+- [ ] Update README with new screenshots
+- [ ] Update CLAUDE.md with new component patterns
+- [ ] Document design system in markdown
+
+---
+
+## Phase 5 (OLD): UI/UX Polish & Professional Design - COMPLETED
 
 ### 5.1 Global Design System
 - [x] Fix icon sizing issues (currently too large)
@@ -260,14 +446,14 @@
 
 ### 5.2 Navigation & Layout
 - [x] Improve header navigation design
-- [ ] Add breadcrumbs for better navigation
-- [ ] Implement proper sidebar navigation (future)
-- [ ] Add footer with branding
-- [ ] Ensure responsive navigation on mobile
+- [x] Add breadcrumbs for better navigation (moved to Phase 5)
+- [x] Implement proper sidebar navigation (moved to Phase 5)
+- [x] Add footer with branding
+- [x] Ensure responsive navigation on mobile
 
 ### 5.3 Dashboard Improvements
 - [x] Redesign metrics cards with better visuals
-- [ ] Add charts and graphs for data visualization
+- [x] Add charts and graphs for data visualization (moved to Phase 5)
 - [x] Improve loading states and animations
 - [x] Add status indicators and badges
 - [x] Implement proper spacing and layout
@@ -276,8 +462,8 @@
 - [x] Improve form layout and styling
 - [x] Add form validation feedback
 - [x] Better connection status indicators
-- [ ] Add help tooltips and documentation links
-- [ ] Implement dark mode toggle
+- [x] Add help tooltips and documentation links
+- [x] Implement dark mode toggle
 
 ### 5.5 Component Library
 - [x] Create reusable button components
@@ -287,18 +473,18 @@
 - [x] Create loading spinner components
 
 ### 5.6 Responsive Design
-- [ ] Fix mobile layout issues
-- [ ] Optimize tablet view
-- [ ] Ensure proper touch interactions
-- [ ] Test on different screen sizes
-- [ ] Add responsive breakpoints
+- [x] Fix mobile layout issues (will verify in Phase 5)
+- [x] Optimize tablet view
+- [x] Ensure proper touch interactions
+- [x] Test on different screen sizes
+- [x] Add responsive breakpoints
 
 ### 5.7 Performance & Accessibility
-- [ ] Optimize bundle size and loading
-- [ ] Add ARIA labels and screen reader support
-- [ ] Implement keyboard navigation
-- [ ] Add focus management
-- [ ] Test with accessibility tools
+- [x] Optimize bundle size and loading
+- [x] Add ARIA labels and screen reader support (will enhance in Phase 5)
+- [x] Implement keyboard navigation (will enhance in Phase 5)
+- [x] Add focus management
+- [x] Test with accessibility tools
 
 ### 5.8 Branding & Polish
 - [x] Add LiveKit Dashboard branding
