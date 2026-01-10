@@ -79,8 +79,8 @@ export function DataTable<T>({
   // Empty state
   if (data.length === 0) {
     return (
-      <div className="border border-border rounded-lg overflow-hidden">
-        <div className="bg-card">
+      <div className="border border-border rounded-lg overflow-hidden bg-card">
+        <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/30 border-b border-border">
               <tr>
@@ -93,22 +93,22 @@ export function DataTable<T>({
             </thead>
           </table>
         </div>
-        <div className="py-12 text-center">
+        <div className="py-16 text-center animate-fade-in">
           <svg
-            className="mx-auto h-12 w-12 text-muted-foreground"
+            className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            strokeWidth="1.5"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={1}
               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
             />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-foreground">No data</h3>
-          <p className="mt-1 text-sm text-muted-foreground">{emptyMessage}</p>
+          <h3 className="text-base font-semibold text-foreground mb-1">No sessions found</h3>
+          <p className="text-sm text-muted-foreground">{emptyMessage}</p>
         </div>
       </div>
     );

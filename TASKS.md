@@ -401,12 +401,14 @@
 - [ ] Test settings page with new theme
 
 ### 5.12 Loading & Empty States Polish
-- [ ] Create `TableSkeleton` component matching table structure
-- [ ] Update `EmptyState` component with better design
-- [ ] Add illustrations or icons to empty states
-- [ ] Add micro-animations for state transitions
-- [ ] Ensure consistent loading UX across all views
-- [ ] Test all loading and empty state scenarios
+- [x] Create `TableSkeleton` component matching table structure (already implemented)
+- [x] Create improved `EmptyState` component with better design
+- [x] Add illustrations/icons to empty states
+- [x] Add micro-animations for state transitions (fade-in, shimmer)
+- [x] Update DataTable empty state with improved styling
+- [x] Add shimmer animation to Tailwind config
+- [x] Ensure consistent loading UX across all views
+- [x] Test all loading and empty state scenarios
 
 ### 5.13 Responsive Design & Mobile
 - [ ] Test data table on mobile (consider card fallback view)
