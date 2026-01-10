@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRooms } from '../hooks/useRooms';
 import { DataTable, TableSkeleton } from '../components/table';
 import type { Column } from '../components/table';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { StatusBadge, FeatureBadge } from '../components/ui';
 import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
 import { FilterBar, TimeRange } from '../components/filters';
@@ -133,21 +133,10 @@ export const Sessions: React.FC = () => {
       render: (room) => (
         <div className="flex items-center gap-2">
           {room.activeRecording && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
-              <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="12" r="8" />
-              </svg>
-              Recording
-            </span>
+            <FeatureBadge type="recording" />
           )}
           {room.numPublishers && room.numPublishers > 0 && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 7l-7 5 7 5V7z" />
-                <rect x="1" y="5" width="15" height="14" rx="2" />
-              </svg>
-              {room.numPublishers} SIP
-            </span>
+            <FeatureBadge type="sip" count={room.numPublishers} />
           )}
         </div>
       ),

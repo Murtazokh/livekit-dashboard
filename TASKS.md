@@ -354,19 +354,22 @@
 - [x] Verify no excessive API calls (pauses when tab not visible)
 
 ### 5.8 Status & Feature Badges
-- [ ] Update `StatusBadge` component to match LiveKit Cloud style
-- [ ] Add status variants:
-  - ACTIVE (green with dot)
+- [x] Update `StatusBadge` component to match LiveKit Cloud style
+- [x] Add status variants:
+  - ACTIVE (green with pulsing dot)
   - CLOSED (gray)
   - ERROR (red)
-  - CONNECTING (yellow)
-- [ ] Create `FeatureBadge` component for room features
-  - Agents badge
-  - SIP badge
-  - Recording badge
-- [ ] Add icons to badges
-- [ ] Style badges to match reference design
-- [ ] Test badges in table context
+  - CONNECTING (yellow/warning)
+  - SUCCESS, WARNING, INFO
+- [x] Create `FeatureBadge` component for room features
+  - Recording badge (red with dot icon)
+  - SIP badge (blue with phone icon)
+  - Agents badge (green with microphone icon)
+  - Transcription badge (yellow with document icon)
+- [x] Add icons to badges
+- [x] Style badges to match reference design using design tokens
+- [x] Test badges in table context (Sessions page)
+- [x] Create ui components barrel export (index.ts)
 
 ### 5.9 Session Details View
 - [ ] Create `SessionDetailsModal` component

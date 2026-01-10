@@ -1,52 +1,63 @@
 import React from 'react';
 
+export type StatusVariant = 'active' | 'closed' | 'error' | 'connecting' | 'success' | 'warning' | 'info';
+
 interface StatusBadgeProps {
-  status: 'success' | 'error' | 'warning' | 'info' | 'active' | 'inactive';
+  status: StatusVariant;
   children: React.ReactNode;
   size?: 'sm' | 'md';
+  showDot?: boolean;
   className?: string;
 }
 
 /**
  * Status badge component for displaying different states
+ * Matches LiveKit Cloud Dashboard aesthetic
  */
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
   status,
   children,
   size = 'sm',
+  showDot = true,
   className = ''
 }) => {
   const statusStyles = {
-    success: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20',
-    error: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20',
-    warning: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20',
-    info: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-    active: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20',
-    inactive: 'bg-muted text-muted-foreground border-muted-foreground/20',
+    active: 'bg-success/10 text-success border-success/20',
+    closed: 'bg-muted/50 text-muted-foreground border-border',
+    error: 'bg-destructive/10 text-destructive border-destructive/20',
+    connecting: 'bg-warning/10 text-warning border-warning/20',
+    success: 'bg-success/10 text-success border-success/20',
+    warning: 'bg-warning/10 text-warning border-warning/20',
+    info: 'bg-info/10 text-info border-info/20',
+  };
+
+  const dotColors = {
+    active: 'bg-success',
+    closed: 'bg-muted-foreground',
+    error: 'bg-destructive',
+    connecting: 'bg-warning',
+    success: 'bg-success',
+    warning: 'bg-warning',
+    info: 'bg-info',
   };
 
   const sizeStyles = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-3 py-1.5 text-sm',
+    sm: 'px-2 py-0.5 text-xs',
+    md: 'px-3 py-1 text-sm',
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border font-medium ${statusStyles[status]} ${sizeStyles[size]} ${className}`}
+      className={`inline-flex items-center rounded border font-medium ${statusStyles[status]} ${sizeStyles[size]} ${className}`}
     >
-      <span className="relative flex h-2 w-2 mr-2">
-        {status === 'active' && (
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        )}
-        <span className={`relative inline-flex rounded-full h-2 w-2 ${
-          status === 'success' ? 'bg-green-500' :
-          status === 'error' ? 'bg-red-500' :
-          status === 'warning' ? 'bg-yellow-500' :
-          status === 'info' ? 'bg-blue-500' :
-          status === 'active' ? 'bg-green-500' :
-          'bg-muted-foreground'
-        }`}></span>
-      </span>
+      {showDot && (
+        <span className="relative flex h-2 w-2 mr-1.5">
+          {status === 'active' && (
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+          )}
+          <span className={`relative inline-flex rounded-full h-2 w-2 ${dotColors[status]}`}></span>
+        </span>
+      )}
       {children}
     </span>
   );
