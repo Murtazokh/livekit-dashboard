@@ -1,6 +1,7 @@
 import React from 'react';
 import { SearchInput } from './SearchInput';
-import { TimeRangeSelect, TimeRange } from './TimeRangeSelect';
+import { TimeRangeSelect } from './TimeRangeSelect';
+import type { TimeRange } from './TimeRangeSelect';
 
 interface FilterBarProps {
   searchValue: string;

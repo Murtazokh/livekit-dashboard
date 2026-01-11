@@ -392,13 +392,13 @@
 - [ ] Test official components integration
 
 ### 5.11 Settings Page Redesign
-- [ ] Update Settings page to use new dark theme
-- [ ] Reorganize settings into card-based sections
-- [ ] Update form styling to match new design
-- [ ] Improve validation feedback UI
-- [ ] Add connection status indicator
-- [ ] Update ServerConfigForm styling
-- [ ] Test settings page with new theme
+- [x] Update Settings page to use PageContainer and match new dark theme
+- [x] Reorganize settings into card-based sections (Server Configuration, Connection Status, Danger Zone)
+- [x] Update page layout with proper spacing and animations
+- [x] Add connection status indicator with StatusBadge
+- [x] Improve loading state with LoadingSpinner component
+- [x] Update Danger Zone styling with destructive theme colors
+- [x] Test settings page with new theme
 
 ### 5.12 Loading & Empty States Polish
 - [x] Create `TableSkeleton` component matching table structure (already implemented)

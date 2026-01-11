@@ -5,7 +5,8 @@ import type { Column } from '../components/table';
 import { StatusBadge, FeatureBadge } from '../components/ui';
 import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
-import { FilterBar, TimeRange } from '../components/filters';
+import { FilterBar } from '../components/filters';
+import type { TimeRange } from '../components/filters';
 import type { Room } from '@/core/domain/Room';
 
 /**

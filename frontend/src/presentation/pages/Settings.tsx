@@ -1,10 +1,13 @@
 import React from 'react';
 import { ServerConfigForm } from '../components/settings/ServerConfigForm';
 import { useSettings } from '../hooks/useSettings';
+import { PageContainer } from '../components/layout/PageContainer';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { StatusBadge } from '../components/ui';
 
 /**
  * Settings page for configuring LiveKit server connection
- * Provides a user interface for managing server credentials and testing connectivity
+ * Matches LiveKit Cloud Dashboard aesthetic with card-based sections
  */
 export const Settings: React.FC = () => {
   const {
@@ -23,91 +26,88 @@ export const Settings: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <svg className="h-6 w-6 animate-spin" viewBox="0 0 24 24">
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-              fill="none"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          <span className="text-lg">Loading settings...</span>
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-16">
+          <LoadingSpinner size="lg" />
+          <span className="mt-4 text-sm text-muted-foreground">Loading settings...</span>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Configure your LiveKit server to start monitoring your real-time communication infrastructure.
+    <PageContainer>
+      <div className="space-y-6 animate-fade-in">
+        {/* Page Header */}
+        <div>
+          <h2 className="text-2xl font-semibold">Settings</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Configure your LiveKit server connection and monitoring preferences
           </p>
         </div>
 
-        <ServerConfigForm
-          config={config}
-          onConfigChange={updateConfig}
-          onSubmit={saveConfig}
-          onTestConnection={testConnection}
-          isSaving={isSaving}
-          isValidating={isValidating}
-          error={error}
-          success={success}
-        />
+        {/* Server Configuration Card */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold">Server Configuration</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Connect to your LiveKit server to start monitoring sessions
+            </p>
+          </div>
 
-        {/* Configuration Status */}
-        <div className="mt-8 max-w-2xl mx-auto">
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h3 className="text-sm font-medium mb-2">Configuration Status</h3>
-            <div className="flex items-center space-x-2 text-sm">
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  isConfigComplete() ? 'bg-green-500' : 'bg-yellow-500'
-                }`}
-              />
-              <span className={isConfigComplete() ? 'text-green-700 dark:text-green-400' : 'text-yellow-700 dark:text-yellow-400'}>
-                {isConfigComplete() ? 'Configuration complete' : 'Configuration incomplete'}
-              </span>
-            </div>
+          <ServerConfigForm
+            config={config}
+            onConfigChange={updateConfig}
+            onSubmit={saveConfig}
+            onTestConnection={testConnection}
+            isSaving={isSaving}
+            isValidating={isValidating}
+            error={error}
+            success={success}
+          />
+        </div>
+
+        {/* Configuration Status Card */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-4">Connection Status</h3>
+          <div className="flex items-center gap-3">
+            <StatusBadge
+              status={isConfigComplete() ? 'success' : 'warning'}
+              size="md"
+            >
+              {isConfigComplete() ? 'Connected' : 'Not Configured'}
+            </StatusBadge>
             {isConfigComplete() && (
-              <p className="text-xs text-muted-foreground mt-1">
-                You can now view your dashboard and monitor your LiveKit rooms.
-              </p>
+              <span className="text-sm text-muted-foreground">
+                Dashboard is ready to monitor your LiveKit sessions
+              </span>
             )}
           </div>
         </div>
 
-        {/* Clear Configuration */}
+        {/* Danger Zone Card */}
         {isConfigComplete() && (
-          <div className="mt-8 max-w-2xl mx-auto">
-            <div className="border-t pt-6">
-              <h3 className="text-sm font-medium text-destructive mb-2">Danger Zone</h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                Clear all saved configuration. This action cannot be undone.
-              </p>
-              <button
-                onClick={clearConfig}
-                className="inline-flex items-center justify-center rounded-md border border-destructive bg-background px-4 py-2 text-sm font-medium text-destructive shadow-sm hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                Clear Configuration
-              </button>
+          <div className="bg-card border border-destructive/20 rounded-lg p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-destructive mb-1">Danger Zone</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Clear all saved configuration. You will need to reconfigure your server connection.
+                </p>
+                <button
+                  onClick={clearConfig}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-lg text-sm font-medium border border-destructive/20 hover:bg-destructive hover:text-destructive-foreground focus:outline-none focus:ring-2 focus:ring-destructive/50 transition-colors"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  </svg>
+                  Clear Configuration
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
