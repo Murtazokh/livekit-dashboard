@@ -6,6 +6,7 @@ import { StatusBadge, FeatureBadge } from '../components/ui';
 import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
 import { FilterBar } from '../components/filters';
+import { MetricCard, MiniChart } from '../components/metrics';
 import type { TimeRange } from '../components/filters';
 import type { Room } from '@/core/domain/Room';
 
@@ -25,6 +26,25 @@ export const Sessions: React.FC = () => {
       setLastUpdated(new Date(dataUpdatedAt));
     }
   }, [dataUpdatedAt]);
+
+  // Calculate metrics from rooms data
+  const totalRooms = rooms?.length || 0;
+  const totalParticipants = rooms?.reduce((sum, room) => sum + room.numParticipants, 0) || 0;
+  const totalPublishers = rooms?.reduce((sum, room) => sum + (room.numPublishers || 0), 0) || 0;
+
+  // Generate mock trend data for demonstration
+  // TODO: Replace with real historical data from API
+  const roomsTrendData = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 10) + 1);
+  }, []);
+
+  const participantsTrendData = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 20) + 5);
+  }, []);
+
+  const publishersTrendData = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 8) + 1);
+  }, []);
 
   // Filter rooms based on search value
   const filteredRooms = useMemo(() => {
@@ -202,6 +222,73 @@ export const Sessions: React.FC = () => {
           </p>
         </div>
         <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
+      </div>
+
+      {/* Metrics Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <MetricCard
+          title="Total Rooms"
+          value={totalRooms}
+          icon={
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+            </svg>
+          }
+          iconColor="text-primary"
+          trend={{ value: 12, isPositive: true }}
+          chart={
+            <MiniChart
+              data={roomsTrendData}
+              color="hsl(var(--primary))"
+              width={120}
+              height={32}
+            />
+          }
+        />
+
+        <MetricCard
+          title="Active Participants"
+          value={totalParticipants}
+          icon={
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+          }
+          iconColor="text-success"
+          trend={{ value: 8, isPositive: true }}
+          chart={
+            <MiniChart
+              data={participantsTrendData}
+              color="hsl(var(--success))"
+              width={120}
+              height={32}
+            />
+          }
+        />
+
+        <MetricCard
+          title="Active Publishers"
+          value={totalPublishers}
+          icon={
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="23 7 16 12 23 17 23 7"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          }
+          iconColor="text-info"
+          trend={{ value: 5, isPositive: false }}
+          chart={
+            <MiniChart
+              data={publishersTrendData}
+              color="hsl(var(--info))"
+              width={120}
+              height={32}
+            />
+          }
+        />
       </div>
 
       {/* Filter Bar */}

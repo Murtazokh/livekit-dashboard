@@ -314,15 +314,15 @@
 - [x] Add trend indicators (up/down arrows with percentages)
 
 ### 5.5 Sessions Page (Dashboard Replacement)
-- [ ] Rename Dashboard.tsx to Sessions.tsx or create new Sessions page
-- [ ] Replace RoomList cards with DataTable
-- [ ] Add metric cards at top of page
-- [ ] Integrate filter bar component
-- [ ] Update page layout to match LiveKit Cloud
-- [ ] Add page header with title and controls
-- [ ] Update routing if page renamed
-- [ ] Remove old RoomCard component (if not needed elsewhere)
-- [ ] Test entire sessions page flow
+- [x] Create dedicated Sessions.tsx page with DataTable
+- [x] Replace RoomList cards with professional DataTable component
+- [x] Add metric cards at top of page (Total Rooms, Participants, Publishers)
+- [x] Integrate filter bar component with search and controls
+- [x] Update page layout to match LiveKit Cloud aesthetic
+- [x] Add page header with title, description, and LiveIndicator
+- [x] Keep both Dashboard (/) and Sessions (/sessions) pages for flexibility
+- [ ] Consider removing old RoomCard component (currently still used in Dashboard)
+- [x] Test entire sessions page flow with metrics and filtering
 
 ### 5.6 Filters & Real-time Controls
 - [x] Create `FilterBar` component (`frontend/src/presentation/components/filters/FilterBar.tsx`)
