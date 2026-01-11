@@ -154,4 +154,46 @@ router.get('/rooms/:roomName/agents', extractLiveKitConfig, rateLimit, async (re
   }
 });
 
+// POST /api/rooms/:roomName/token - generate access token for room connection
+router.post('/rooms/:roomName/token', extractLiveKitConfig, rateLimit, async (req, res, next) => {
+  try {
+    const { roomName } = req.params;
+    const { participantIdentity, participantName } = req.body;
+    const config = req.livekitConfig || {
+      host: process.env.LIVEKIT_HOST || 'http://localhost:7880',
+      apiKey: process.env.LIVEKIT_API_KEY || 'devkey',
+      apiSecret: process.env.LIVEKIT_API_SECRET || 'secret',
+    };
+
+    if (!roomName) {
+      res.status(400).json({
+        success: false,
+        error: 'Room name is required',
+      });
+      return;
+    }
+
+    if (!participantIdentity) {
+      res.status(400).json({
+        success: false,
+        error: 'Participant identity is required',
+      });
+      return;
+    }
+
+    const service = new LiveKitService(config);
+    const token = await service.generateToken(roomName, participantIdentity, participantName);
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        serverUrl: config.host,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

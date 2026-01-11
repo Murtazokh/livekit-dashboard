@@ -70,6 +70,28 @@ export class ApiClient implements ILiveKitService {
   }
 
   /**
+   * Generate access token for connecting to a room
+   * @param roomName - Name of the room to join
+   * @param participantIdentity - Unique identifier for the participant
+   * @param participantName - Display name for the participant
+   * @returns Promise resolving to token and server URL
+   */
+  async generateRoomToken(
+    roomName: string,
+    participantIdentity: string,
+    participantName?: string
+  ): Promise<{ token: string; serverUrl: string }> {
+    const response = await this.makeRequest<ApiResponse<{ token: string; serverUrl: string }>>(
+      `/rooms/${encodeURIComponent(roomName)}/token`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ participantIdentity, participantName }),
+      }
+    );
+    return response.data!;
+  }
+
+  /**
    * Make an HTTP request to the API
    * @param endpoint - API endpoint (without base URL)
    * @param options - Fetch options

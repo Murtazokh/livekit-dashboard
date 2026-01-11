@@ -7,6 +7,7 @@ import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
 import { FilterBar } from '../components/filters';
 import { MetricCard, MiniChart } from '../components/metrics';
+import { SessionDetailsModal } from '../components/sessions';
 import type { TimeRange } from '../components/filters';
 import type { Room } from '@/core/domain/Room';
 
@@ -19,6 +20,7 @@ export const Sessions: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [timeRange, setTimeRange] = useState<TimeRange>('last_24_hours');
   const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState(true);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   // Update last updated time when data changes
   useEffect(() => {
@@ -175,8 +177,7 @@ export const Sessions: React.FC = () => {
   ];
 
   const handleRowClick = (room: Room) => {
-    console.log('Room clicked:', room);
-    // TODO: Open room details modal or navigate to room details page
+    setSelectedRoom(room);
   };
 
   if (error) {
@@ -212,17 +213,18 @@ export const Sessions: React.FC = () => {
   }
 
   return (
-    <PageContainer>
-      {/* Header with Live Indicator */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-semibold">Sessions</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Real-time view of all active and completed sessions
-          </p>
+    <>
+      <PageContainer>
+        {/* Header with Live Indicator */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-semibold">Sessions</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Real-time view of all active and completed sessions
+            </p>
+          </div>
+          <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
         </div>
-        <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
-      </div>
 
       {/* Metrics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -322,6 +324,16 @@ export const Sessions: React.FC = () => {
           }
         />
       )}
-    </PageContainer>
+      </PageContainer>
+
+      {/* Session Details Modal */}
+      {selectedRoom && (
+        <SessionDetailsModal
+          room={selectedRoom}
+          isOpen={!!selectedRoom}
+          onClose={() => setSelectedRoom(null)}
+        />
+      )}
+    </>
   );
 };

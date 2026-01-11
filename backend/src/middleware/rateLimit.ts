@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 // Simple in-memory rate limiter (in production, use Redis or similar)
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_REQUESTS = 100; // requests per window
+const WINDOW_MS = 1 * 60 * 1000; // 1 minute
+const MAX_REQUESTS = 1000; // requests per window (generous for development)
 
 export const rateLimit = (req: Request, res: Response, next: NextFunction): void => {
   const clientIP = req.ip || 'unknown';

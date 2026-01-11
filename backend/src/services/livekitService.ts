@@ -1,4 +1,4 @@
-import { RoomServiceClient } from 'livekit-server-sdk';
+import { RoomServiceClient, AccessToken } from 'livekit-server-sdk';
 import { AgentDispatchClient } from 'livekit-server-sdk';
 
 export interface ServerConfig {
@@ -47,8 +47,10 @@ export interface Agent {
 export class LiveKitService {
   private roomClient: RoomServiceClient;
   private agentClient: AgentDispatchClient;
+  private config: ServerConfig;
 
   constructor(config: ServerConfig) {
+    this.config = config;
     this.roomClient = new RoomServiceClient(
       config.host,
       config.apiKey,
@@ -149,6 +151,44 @@ export class LiveKitService {
     } catch (error) {
       console.error(`Error getting agents for room ${roomName}:`, error);
       throw new Error(`Failed to get agents: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Generate JWT access token for client connection to a room
+   * @param roomName - Name of the room to join
+   * @param participantIdentity - Unique identifier for the participant
+   * @param participantName - Display name for the participant
+   * @returns JWT token string
+   */
+  async generateToken(
+    roomName: string,
+    participantIdentity: string,
+    participantName?: string
+  ): Promise<string> {
+    try {
+      const token = new AccessToken(
+        this.config.apiKey,
+        this.config.apiSecret,
+        {
+          identity: participantIdentity,
+          name: participantName || participantIdentity,
+        }
+      );
+
+      // Grant permissions to join the room
+      token.addGrant({
+        roomJoin: true,
+        room: roomName,
+        canPublish: false, // Dashboard viewers don't publish
+        canSubscribe: true, // Can subscribe to tracks
+        canPublishData: false,
+      });
+
+      return await token.toJwt();
+    } catch (error) {
+      console.error(`Error generating token for room ${roomName}:`, error);
+      throw new Error(`Failed to generate token: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }
