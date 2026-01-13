@@ -611,42 +611,528 @@
 
 ---
 
-## Phase 8: Testing
+## Phase 8: Production-Grade Testing
 
-### 8.1 Unit Tests - Frontend
-- [ ] Test Room domain model
-- [ ] Test Participant domain model
-- [ ] Test Agent domain model
-- [ ] Test ValidateConnection use case
-- [ ] Test GetRooms use case
-- [ ] Test GetParticipants use case
-- [ ] Test GetAgents use case
-- [ ] Test LocalStorageConfig
-- [ ] Test ApiClient methods
-- [ ] Run all tests and verify 80%+ coverage
+### 8.0 Testing Infrastructure Setup
 
-### 8.2 Unit Tests - Backend
-- [ ] Test LiveKitService methods
-- [ ] Test roomsController
-- [ ] Test participantsController
-- [ ] Test agentsController
-- [ ] Test middleware functions
-- [ ] Run all tests and verify 80%+ coverage
+#### 8.0.1 Frontend Testing Setup
+- [x] Install Vitest as test runner (`npm install -D vitest`)
+- [x] Install React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`)
+- [x] Install testing utilities (`@testing-library/react-hooks`, `happy-dom` or `jsdom`)
+- [x] Install MSW for API mocking (`msw`)
+- [x] Create `vitest.config.ts` in frontend directory
+- [x] Create `setupTests.ts` for global test configuration
+- [x] Create `__mocks__` directory for mock implementations
+- [x] Create `__fixtures__` directory for test data
+- [x] Create `test-utils.tsx` with custom render function and providers
+- [x] Add test scripts to frontend/package.json (`test`, `test:watch`, `test:coverage`)
+- [x] Configure coverage thresholds (80% minimum)
+- [x] Test that Vitest runs successfully
 
-### 8.3 Integration Tests
-- [ ] Test Settings page saves configuration
-- [ ] Test Dashboard loads rooms correctly
-- [ ] Test API client calls backend correctly
-- [ ] Test backend calls LiveKit API correctly
-- [ ] Test error handling end-to-end
-- [ ] Run all integration tests
+#### 8.0.2 Backend Testing Setup
+- [x] Install Vitest as test runner (`npm install -D vitest`)
+- [x] Install Supertest for HTTP testing (`supertest`, `@types/supertest`)
+- [x] Install testing utilities (`@vitest/coverage-v8` for coverage)
+- [x] Create `vitest.config.ts` in backend directory
+- [x] Create `setupTests.ts` for global test configuration
+- [x] Create `__mocks__` directory for mocking LiveKit SDK
+- [x] Create `__fixtures__` directory for test data (rooms, participants, agents)
+- [x] Create test utilities for Express app instance
+- [x] Add test scripts to backend/package.json (`test`, `test:watch`, `test:coverage`)
+- [x] Configure coverage thresholds (80% minimum)
+- [x] Test that Vitest runs successfully
 
-### 8.4 E2E Tests (Optional)
-- [ ] Set up Playwright or Cypress
-- [ ] Test complete user flow (configure → view dashboard)
-- [ ] Test navigation between pages
-- [ ] Test refresh functionality
-- [ ] Run E2E tests in CI environment
+#### 8.0.3 Test Data Fixtures
+- [x] Create room fixtures (`roomFixtures.ts`)
+  - activeRoom, closedRoom, roomWithParticipants, emptyRoom
+- [x] Create participant fixtures (`participantFixtures.ts`)
+  - activeParticipant, disconnectedParticipant, publisherParticipant, subscriberParticipant
+- [ ] Create agent fixtures (`agentFixtures.ts`)
+  - transcriptionAgent, chatAgent, customAgent
+- [x] Create config fixtures (`configFixtures.ts`)
+  - validConfig, invalidConfig, missingFieldsConfig
+- [ ] Create API response fixtures (`apiResponseFixtures.ts`)
+- [x] Export all fixtures from `__fixtures__/index.ts`
+
+### 8.1 Frontend Unit Tests - Domain Layer
+
+#### 8.1.1 Domain Entities Tests
+- [ ] Test Room entity (`Room.test.ts`)
+  - Test Room interface structure
+  - Test RoomState enum values
+  - Test Room type guards (if any)
+  - Test required vs optional properties
+- [ ] Test Participant entity (`Participant.test.ts`)
+  - Test Participant interface structure
+  - Test ParticipantState enum (JOINING, JOINED, ACTIVE, DISCONNECTED)
+  - Test ConnectionQuality enum
+  - Test Participant type guards (if any)
+- [ ] Test Agent entity (`Agent.test.ts`)
+  - Test Agent interface structure
+  - Test AgentType enum (VOICE, CHAT, TRANSCRIPTION, CUSTOM)
+  - Test AgentState enum
+  - Test Agent metadata structure
+- [ ] Run domain tests and verify 100% coverage
+
+### 8.2 Frontend Unit Tests - Core Layer (Use Cases)
+
+#### 8.2.1 GetRooms Use Case Tests
+- [x] Create `GetRooms.test.ts` with comprehensive test suite
+  - **Happy Path**: Test fetching rooms successfully
+  - **Validation**: Test with valid livekitService mock
+  - **Error Handling**: Test when service throws error
+  - **Filtering**: Test hasParticipants filter
+  - **Filtering**: Test minParticipants filter
+  - **Filtering**: Test namePattern filter
+  - **Filtering**: Test combined filters
+  - **Edge Cases**: Test empty rooms array
+  - **Edge Cases**: Test null/undefined handling
+- [x] Verify GetRooms test coverage is 100% (33 tests passing)
+
+#### 8.2.2 GetParticipants Use Case Tests
+- [ ] Create `GetParticipants.test.ts` with comprehensive test suite
+  - **Happy Path**: Test fetching participants successfully
+  - **Validation**: Test with valid roomName and service
+  - **Error Handling**: Test when service throws error
+  - **Error Handling**: Test with invalid roomName
+  - **Filtering**: Test isPublisher filter
+  - **Filtering**: Test state filter
+  - **Filtering**: Test hasTracks filter
+  - **Filtering**: Test combined filters
+  - **Edge Cases**: Test empty participants array
+  - **Edge Cases**: Test room not found scenario
+- [ ] Verify GetParticipants test coverage is 100%
+
+#### 8.2.3 ValidateConnection Use Case Tests
+- [x] Create `ValidateConnection.test.ts` with comprehensive test suite
+  - **Happy Path**: Test successful connection validation
+  - **Validation**: Test with valid config
+  - **Error Handling**: Test with invalid credentials (401)
+  - **Error Handling**: Test with network error
+  - **Error Handling**: Test with timeout error
+  - **Error Handling**: Test with invalid server URL
+  - **Error Messages**: Test user-friendly error transformations
+  - **Edge Cases**: Test with WebSocket URL format
+  - **Edge Cases**: Test with HTTP URL format
+  - **Edge Cases**: Test with missing protocol
+- [x] Verify ValidateConnection test coverage is 100% (15 tests passing)
+
+### 8.3 Frontend Unit Tests - Infrastructure Layer
+
+#### 8.3.1 LocalStorageConfig Tests
+- [x] Create `LocalStorageConfig.test.ts` with comprehensive test suite
+  - **Happy Path**: Test saveConfig saves to localStorage
+  - **Happy Path**: Test loadConfig retrieves from localStorage
+  - **Happy Path**: Test clearConfig removes from localStorage
+  - **Happy Path**: Test hasConfig returns true when config exists
+  - **Validation**: Test saveConfig validates before saving
+  - **Validation**: Test saveConfig rejects invalid config
+  - **Error Handling**: Test loadConfig handles corrupted data
+  - **Error Handling**: Test loadConfig handles missing data
+  - **Security**: Test that secret is redacted in logs
+  - **Edge Cases**: Test with empty config
+  - **Edge Cases**: Test with partial config
+  - **Edge Cases**: Test localStorage quota exceeded
+- [x] Mock localStorage using Vitest global mocks
+- [x] Test localStorage.setItem, getItem, removeItem calls
+- [x] Verify LocalStorageConfig test coverage is 100% (37 tests passing)
+
+#### 8.3.2 ApiClient Tests
+- [ ] Create `ApiClient.test.ts` with comprehensive test suite
+  - **Initialization**: Test initialize method sets config
+  - **Initialization**: Test methods throw before initialization
+  - **Happy Path**: Test validateConnection success
+  - **Happy Path**: Test listRooms returns rooms array
+  - **Happy Path**: Test getRoomDetails returns room
+  - **Happy Path**: Test listParticipants returns participants
+  - **Happy Path**: Test getAgents returns agents
+  - **Happy Path**: Test generateRoomToken returns token
+  - **Headers**: Test X-LiveKit-Host header injection
+  - **Headers**: Test X-LiveKit-Key header injection
+  - **Headers**: Test X-LiveKit-Secret header injection
+  - **URL Encoding**: Test roomName with spaces
+  - **URL Encoding**: Test roomName with special characters
+  - **Error Handling**: Test 400 Bad Request
+  - **Error Handling**: Test 401 Unauthorized
+  - **Error Handling**: Test 404 Not Found
+  - **Error Handling**: Test 500 Internal Server Error
+  - **Error Handling**: Test network error
+  - **Error Handling**: Test timeout error
+  - **Edge Cases**: Test empty response
+  - **Edge Cases**: Test malformed JSON response
+- [ ] Use MSW to mock HTTP requests
+- [ ] Test fetch calls with correct URLs and headers
+- [ ] Verify ApiClient test coverage is 100%
+
+### 8.4 Frontend Integration Tests - Presentation Layer
+
+#### 8.4.1 ApiClientProvider Tests
+- [ ] Create `ApiClientProvider.test.tsx` with integration tests
+  - **Initialization**: Test provider loads config on mount
+  - **Initialization**: Test apiClient.initialize called with config
+  - **Initialization**: Test isInitialized flag set correctly
+  - **Context**: Test useApiClient hook returns apiClient
+  - **Context**: Test useApiClient hook returns isInitialized
+  - **Error Handling**: Test with missing config
+  - **Error Handling**: Test with corrupted config
+  - **Edge Cases**: Test with invalid config
+  - **Integration**: Test full initialization flow
+- [ ] Use React Testing Library to test provider
+- [ ] Mock LocalStorageConfig
+- [ ] Verify ApiClientProvider test coverage is 90%+
+
+#### 8.4.2 useRooms Hook Tests
+- [ ] Create `useRooms.test.ts` with integration tests
+  - **Happy Path**: Test hook returns rooms data
+  - **Happy Path**: Test hook refetches on interval
+  - **Query State**: Test loading state
+  - **Query State**: Test error state
+  - **Query State**: Test success state
+  - **Conditional Query**: Test query disabled when config incomplete
+  - **Conditional Query**: Test query disabled when not initialized
+  - **Conditional Query**: Test query enabled when ready
+  - **Retry Logic**: Test no retry on 4xx errors
+  - **Retry Logic**: Test retry on 5xx errors
+  - **Retry Logic**: Test exponential backoff
+  - **Cache**: Test staleTime configuration
+  - **Cache**: Test gcTime configuration
+  - **Refetch**: Test refetchOnWindowFocus
+  - **Edge Cases**: Test empty rooms array
+  - **Error Handling**: Test network error handling
+- [ ] Use @testing-library/react-hooks
+- [ ] Create QueryClient wrapper for tests
+- [ ] Mock ApiClient
+- [ ] Verify useRooms test coverage is 90%+
+
+#### 8.4.3 useParticipants Hook Tests
+- [ ] Create `useParticipants.test.ts` with integration tests
+  - **Happy Path**: Test hook returns participants for room
+  - **Query State**: Test loading state
+  - **Query State**: Test error state
+  - **Query State**: Test success state
+  - **Conditional Query**: Test query disabled without roomName
+  - **Conditional Query**: Test query disabled when config incomplete
+  - **Refetch**: Test refetch interval (30 seconds)
+  - **Cache**: Test per-room cache keys
+  - **Error Handling**: Test room not found error
+  - **Edge Cases**: Test empty participants array
+- [ ] Use @testing-library/react-hooks
+- [ ] Mock ApiClient
+- [ ] Verify useParticipants test coverage is 90%+
+
+#### 8.4.4 useSettings Hook Tests
+- [ ] Create `useSettings.test.ts` with integration tests
+  - **Happy Path**: Test loadConfig on mount
+  - **Happy Path**: Test saveConfig updates localStorage
+  - **Happy Path**: Test clearConfig removes config
+  - **Happy Path**: Test testConnection validates config
+  - **State Management**: Test loading state during save
+  - **State Management**: Test loading state during test
+  - **State Management**: Test error state
+  - **State Management**: Test success state
+  - **Validation**: Test config validation before save
+  - **Error Handling**: Test save error handling
+  - **Error Handling**: Test test connection failure
+  - **Edge Cases**: Test save with empty config
+- [ ] Mock LocalStorageConfig and ApiClient
+- [ ] Test state transitions
+- [ ] Verify useSettings test coverage is 90%+
+
+#### 8.4.5 useRoomConnection Hook Tests
+- [ ] Create `useRoomConnection.test.ts` with integration tests
+  - **Happy Path**: Test connection to room
+  - **Happy Path**: Test disconnect from room
+  - **Event Handling**: Test TranscriptionReceived event
+  - **Event Handling**: Test ParticipantConnected event
+  - **Event Handling**: Test ParticipantDisconnected event
+  - **State Management**: Test connection state transitions
+  - **State Management**: Test transcription state updates
+  - **Cleanup**: Test cleanup on unmount
+  - **Error Handling**: Test connection failure
+  - **Error Handling**: Test invalid token
+  - **Edge Cases**: Test reconnection logic
+- [ ] Mock LiveKit Room and events
+- [ ] Test event listener registration/cleanup
+- [ ] Verify useRoomConnection test coverage is 85%+
+
+### 8.5 Backend Unit Tests - Services Layer
+
+#### 8.5.1 LiveKitService Tests
+- [ ] Create `livekitService.test.ts` with comprehensive test suite
+  - **Initialization**: Test service initialization with config
+  - **Happy Path**: Test listRooms returns rooms
+  - **Happy Path**: Test getRoomDetails returns room
+  - **Happy Path**: Test listParticipants returns participants
+  - **Happy Path**: Test getAgents returns agents
+  - **Happy Path**: Test generateRoomToken returns JWT
+  - **Data Transformation**: Test BigInt to number conversion
+  - **Data Transformation**: Test timestamp formatting
+  - **Error Handling**: Test SDK error propagation
+  - **Error Handling**: Test network error
+  - **Error Handling**: Test invalid credentials
+  - **Edge Cases**: Test empty rooms list
+  - **Edge Cases**: Test room not found
+  - **Edge Cases**: Test participant not found
+- [ ] Mock livekit-server-sdk (RoomServiceClient, AgentDispatchClient)
+- [ ] Test all SDK method calls
+- [ ] Verify LiveKitService test coverage is 100%
+
+### 8.6 Backend Unit Tests - Middleware Layer
+
+#### 8.6.1 extractLiveKitConfig Middleware Tests
+- [x] Create `extractLiveKitConfig.test.ts` with comprehensive test suite
+  - **Happy Path**: Test extracts headers correctly
+  - **Happy Path**: Test attaches config to req.livekitConfig
+  - **WebSocket URL**: Test converts ws:// to http://
+  - **WebSocket URL**: Test converts wss:// to https://
+  - **WebSocket URL**: Test preserves http:// and https://
+  - **Fallback**: Test falls through when headers missing
+  - **Validation**: Test with valid headers
+  - **Edge Cases**: Test with partial headers
+  - **Edge Cases**: Test with malformed URL
+  - **Security**: Test header sanitization
+- [x] Mock Express request and response objects
+- [x] Test next() function calls
+- [x] Verify extractLiveKitConfig test coverage is 100% (29 tests passing)
+
+#### 8.6.2 validateConfig Middleware Tests
+- [ ] Create `validateConfig.test.ts` with comprehensive test suite
+  - **Happy Path**: Test validates correct config
+  - **Validation**: Test rejects missing serverUrl
+  - **Validation**: Test rejects missing apiKey
+  - **Validation**: Test rejects missing apiSecret
+  - **Validation**: Test rejects invalid URL format
+  - **Error Response**: Test returns 400 on validation failure
+  - **Error Response**: Test returns correct error message
+  - **Edge Cases**: Test with empty strings
+  - **Edge Cases**: Test with null values
+  - **Edge Cases**: Test with undefined values
+- [ ] Mock Express request and response
+- [ ] Test error responses
+- [ ] Verify validateConfig test coverage is 100%
+
+#### 8.6.3 errorHandler Middleware Tests
+- [ ] Create `errorHandler.test.ts` with comprehensive test suite
+  - **Happy Path**: Test formats error response
+  - **Status Codes**: Test 400 Bad Request
+  - **Status Codes**: Test 401 Unauthorized
+  - **Status Codes**: Test 404 Not Found
+  - **Status Codes**: Test 500 Internal Server Error
+  - **Error Messages**: Test error message extraction
+  - **Development Mode**: Test stack trace in development
+  - **Production Mode**: Test no stack trace in production
+  - **Edge Cases**: Test with non-Error objects
+  - **Edge Cases**: Test with string errors
+  - **Edge Cases**: Test with null/undefined
+- [ ] Mock Express error, request, response, next
+- [ ] Test response.status and response.json calls
+- [ ] Verify errorHandler test coverage is 100%
+
+#### 8.6.4 rateLimit Middleware Tests
+- [ ] Create `rateLimit.test.ts` with comprehensive test suite
+  - **Happy Path**: Test allows requests under limit
+  - **Rate Limiting**: Test blocks requests over limit (1000/min)
+  - **Rate Limiting**: Test per-IP tracking
+  - **Rate Limiting**: Test window reset after 1 minute
+  - **Response**: Test returns 429 when limit exceeded
+  - **Response**: Test returns correct error message
+  - **Edge Cases**: Test with multiple IPs
+  - **Edge Cases**: Test with missing IP
+  - **Performance**: Test doesn't leak memory
+- [ ] Mock Express request and response
+- [ ] Use fake timers to test window reset
+- [ ] Verify rateLimit test coverage is 100%
+
+### 8.7 Backend Integration Tests - API Endpoints
+
+#### 8.7.1 Config Validation Endpoint Tests
+- [ ] Create `api.config.test.ts` with integration tests
+  - **Happy Path**: Test POST /api/config/validate with valid config
+  - **Response**: Test returns success status
+  - **Response**: Test returns validation result
+  - **Error Handling**: Test with invalid credentials
+  - **Error Handling**: Test with network error
+  - **Error Handling**: Test with malformed request body
+  - **Validation**: Test missing serverUrl
+  - **Validation**: Test missing apiKey
+  - **Validation**: Test missing apiSecret
+  - **Edge Cases**: Test with WebSocket URL
+  - **Edge Cases**: Test with HTTP URL
+- [ ] Use Supertest for HTTP testing
+- [ ] Mock LiveKitService
+- [ ] Verify endpoint test coverage is 100%
+
+#### 8.7.2 Rooms Endpoints Tests
+- [ ] Create `api.rooms.test.ts` with integration tests
+  - **Happy Path**: Test GET /api/rooms returns rooms
+  - **Happy Path**: Test GET /api/rooms/:roomName returns room details
+  - **Headers**: Test with valid LiveKit headers
+  - **Headers**: Test with missing headers (fallback to env)
+  - **URL Encoding**: Test roomName with spaces
+  - **URL Encoding**: Test roomName with special characters
+  - **Error Handling**: Test room not found (404)
+  - **Error Handling**: Test invalid credentials (401)
+  - **Error Handling**: Test server error (500)
+  - **Response Format**: Test response structure
+  - **Edge Cases**: Test empty rooms list
+- [ ] Use Supertest for HTTP testing
+- [ ] Mock LiveKitService
+- [ ] Test middleware chain execution
+- [ ] Verify endpoint test coverage is 100%
+
+#### 8.7.3 Participants Endpoints Tests
+- [ ] Create `api.participants.test.ts` with integration tests
+  - **Happy Path**: Test GET /api/rooms/:roomName/participants
+  - **Response**: Test returns participants array
+  - **Error Handling**: Test room not found
+  - **Error Handling**: Test invalid roomName
+  - **URL Encoding**: Test roomName encoding
+  - **Edge Cases**: Test empty participants list
+  - **Edge Cases**: Test room with single participant
+- [ ] Use Supertest for HTTP testing
+- [ ] Mock LiveKitService
+- [ ] Verify endpoint test coverage is 100%
+
+#### 8.7.4 Agents Endpoints Tests
+- [ ] Create `api.agents.test.ts` with integration tests
+  - **Happy Path**: Test GET /api/rooms/:roomName/agents
+  - **Response**: Test returns agents array
+  - **Error Handling**: Test room not found
+  - **Error Handling**: Test no agents in room
+  - **Edge Cases**: Test room with multiple agents
+  - **Edge Cases**: Test agent types (VOICE, CHAT, TRANSCRIPTION)
+- [ ] Use Supertest for HTTP testing
+- [ ] Mock LiveKitService
+- [ ] Verify endpoint test coverage is 100%
+
+#### 8.7.5 Token Generation Endpoint Tests
+- [ ] Create `api.token.test.ts` with integration tests
+  - **Happy Path**: Test POST /api/rooms/:roomName/token
+  - **Response**: Test returns valid JWT token
+  - **Token Validation**: Test token contains correct claims
+  - **Token Validation**: Test token signature is valid
+  - **Error Handling**: Test with invalid request body
+  - **Error Handling**: Test with missing required fields
+  - **Security**: Test token expiration time
+- [ ] Use Supertest for HTTP testing
+- [ ] Mock LiveKitService
+- [ ] Decode and verify JWT structure
+- [ ] Verify endpoint test coverage is 100%
+
+### 8.8 Backend Integration Tests - Controllers
+
+#### 8.8.1 roomsController Tests
+- [ ] Create `roomsController.test.ts` with integration tests
+  - Test listRooms controller logic
+  - Test getRoomDetails controller logic
+  - Test error handling in controller
+  - Test request validation
+  - Test response formatting
+- [ ] Mock LiveKitService
+- [ ] Mock Express request/response
+- [ ] Verify controller test coverage is 95%+
+
+#### 8.8.2 participantsController Tests
+- [ ] Create `participantsController.test.ts` with integration tests
+  - Test listParticipants controller logic
+  - Test error handling
+  - Test request validation
+  - Test response formatting
+- [ ] Mock LiveKitService
+- [ ] Verify controller test coverage is 95%+
+
+#### 8.8.3 agentsController Tests
+- [ ] Create `agentsController.test.ts` with integration tests
+  - Test listAgents controller logic
+  - Test error handling
+  - Test response formatting
+- [ ] Mock LiveKitService
+- [ ] Verify controller test coverage is 95%+
+
+### 8.9 Test Coverage & Quality
+
+#### 8.9.1 Frontend Coverage Analysis
+- [ ] Run frontend tests with coverage (`npm run test:coverage`)
+- [ ] Verify overall coverage is ≥80%
+- [ ] Verify domain layer coverage is 100%
+- [ ] Verify use cases coverage is 100%
+- [ ] Verify infrastructure coverage is ≥90%
+- [ ] Verify hooks coverage is ≥85%
+- [ ] Generate HTML coverage report
+- [ ] Review uncovered lines and add tests
+- [ ] Document any intentionally uncovered code
+
+#### 8.9.2 Backend Coverage Analysis
+- [ ] Run backend tests with coverage (`npm run test:coverage`)
+- [ ] Verify overall coverage is ≥80%
+- [ ] Verify services coverage is 100%
+- [ ] Verify middleware coverage is 100%
+- [ ] Verify controllers coverage is ≥95%
+- [ ] Verify routes coverage is 100%
+- [ ] Generate HTML coverage report
+- [ ] Review uncovered lines and add tests
+- [ ] Document any intentionally uncovered code
+
+#### 8.9.3 Test Quality Review
+- [ ] Review all tests follow AAA pattern (Arrange-Act-Assert)
+- [ ] Verify all tests have clear, descriptive names
+- [ ] Ensure no flaky tests (run tests 10 times)
+- [ ] Verify no test interdependencies
+- [ ] Check test execution speed (should be fast)
+- [ ] Ensure proper cleanup in all tests
+- [ ] Review mock implementations for accuracy
+- [ ] Verify edge cases are covered
+- [ ] Check error scenarios are tested
+
+#### 8.9.4 CI Integration
+- [ ] Add test script to root package.json
+- [ ] Create GitHub Actions workflow for tests
+- [ ] Configure workflow to run on pull requests
+- [ ] Configure workflow to run on push to main
+- [ ] Add coverage reporting to CI
+- [ ] Add test status badge to README
+- [ ] Configure CI to fail on coverage below threshold
+- [ ] Test CI pipeline with failing test
+- [ ] Test CI pipeline with passing tests
+
+### 8.10 E2E Tests (Optional but Recommended)
+
+#### 8.10.1 E2E Testing Setup
+- [ ] Install Playwright (`npm install -D @playwright/test`)
+- [ ] Create `playwright.config.ts`
+- [ ] Create `e2e` directory for E2E tests
+- [ ] Configure test browsers (Chromium, Firefox, WebKit)
+- [ ] Set up test data and fixtures
+- [ ] Create helper functions for common actions
+- [ ] Add E2E test scripts to package.json
+
+#### 8.10.2 E2E User Flows
+- [ ] Test complete onboarding flow
+  - Open app → redirected to settings → enter config → save → redirect to dashboard
+- [ ] Test dashboard viewing flow
+  - Open dashboard → see metrics → see rooms → see real-time updates
+- [ ] Test settings update flow
+  - Change config → test connection → save → verify new config used
+- [ ] Test error recovery flow
+  - Enter invalid config → see error → correct config → see success
+- [ ] Test navigation flow
+  - Navigate between Dashboard, Sessions, Settings
+- [ ] Test real-time updates flow
+  - Load dashboard → wait for auto-refresh → verify new data
+
+#### 8.10.3 E2E Cross-browser Testing
+- [ ] Run all E2E tests on Chromium
+- [ ] Run all E2E tests on Firefox
+- [ ] Run all E2E tests on WebKit/Safari
+- [ ] Fix any browser-specific issues
+- [ ] Verify consistent behavior across browsers
+
+#### 8.10.4 E2E Performance Testing
+- [ ] Test app loads in under 3 seconds
+- [ ] Test API responses are under 1 second
+- [ ] Test real-time updates don't cause lag
+- [ ] Test with throttled network (3G)
+- [ ] Verify no memory leaks during long sessions
 
 ---
 
