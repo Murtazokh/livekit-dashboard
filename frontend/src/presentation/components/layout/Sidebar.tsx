@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { ThemeToggle } from '../ui/ThemeToggle';
 
 interface SidebarProps {
   isCollapsed?: boolean;
@@ -135,7 +136,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleC
       </nav>
 
       {/* Footer / User section (optional) */}
-      <div className="px-4 py-4 border-t border-border">
+      <div className="px-4 py-4 border-t border-border space-y-3">
+        {/* Theme Toggle */}
+        <div className={`flex ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
+          <ThemeToggle />
+        </div>
+
+        {/* Version Info */}
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
             <span className="text-sm font-medium text-primary">LK</span>
