@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { TopNavbar } from './TopNavbar';
 
 interface AppLayoutProps {
   children: React.ReactNode;
   pageTitle?: string;
   pageSubtitle?: string;
   headerActions?: React.ReactNode;
+  lastUpdated?: Date;
+  isRefreshing?: boolean;
 }
 
 /**
@@ -18,6 +21,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   pageTitle,
   pageSubtitle,
   headerActions,
+  lastUpdated,
+  isRefreshing,
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -48,20 +53,25 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Top Navbar - Global controls */}
+      <TopNavbar lastUpdated={lastUpdated} isRefreshing={isRefreshing} />
+
       {/* Mobile overlay */}
       {isMobile && isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30"
+          className="fixed inset-0 bg-black/50 z-30 mt-16"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Below top navbar */}
       <div
         className={`
           ${isMobile ? 'fixed z-40' : 'fixed'}
           ${isMobile && !isMobileSidebarOpen ? '-translate-x-full' : 'translate-x-0'}
           transition-transform duration-300
+          top-16
+          h-[calc(100vh-4rem)]
         `}
       >
         <Sidebar
@@ -74,12 +84,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <div
         className={`
           transition-all duration-300
+          pt-16
           ${isMobile ? 'ml-0' : isSidebarCollapsed ? 'ml-16' : 'ml-64'}
         `}
       >
         {/* Mobile menu button */}
         {isMobile && (
-          <div className="fixed top-4 left-4 z-20">
+          <div className="fixed top-20 left-4 z-20">
             <button
               onClick={() => setIsMobileSidebarOpen(true)}
               className="p-2 rounded-md bg-card border border-border shadow-md hover:bg-card-hover transition-colors"
@@ -104,7 +115,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         <Header title={pageTitle} subtitle={pageSubtitle} actions={headerActions} />
 
         {/* Page content */}
-        <main className="min-h-[calc(100vh-73px)]">{children}</main>
+        <main className="min-h-[calc(100vh-73px-4rem)]">{children}</main>
       </div>
     </div>
   );

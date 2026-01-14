@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { LayoutGrid, Users, Video, X, Clock, Circle, Settings as SettingsIcon } from 'lucide-react';
 import { RoomList } from '../components/rooms/RoomList';
 import { useSettings } from '../hooks/useSettings';
 import { useRooms } from '../hooks/useRooms';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { LiveIndicator } from '../components/ui/LiveIndicator';
 import { PageContainer } from '../components/layout/PageContainer';
 import { MetricCard, MiniChart } from '../components/metrics';
 import type { Room } from '@/core/domain/Room';
@@ -12,19 +11,13 @@ interface DashboardProps {}
 
 /**
  * Main dashboard page showing rooms overview and metrics
+ * Updated with Lucide icons and professional SaaS layout
  */
 export const Dashboard: React.FC<DashboardProps> = () => {
   const { isConfigComplete } = useSettings();
-  const { data: rooms, isFetching, isLoading, dataUpdatedAt } = useRooms();
+  const { data: rooms } = useRooms();
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  // Update last updated time when data changes
-  useEffect(() => {
-    if (dataUpdatedAt) {
-      setLastUpdated(new Date(dataUpdatedAt));
-    }
-  }, [dataUpdatedAt]);
 
   const handleRoomClick = (room: Room) => {
     setSelectedRoom(room);
@@ -39,34 +32,36 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   // Generate mock trend data for demonstration
   // TODO: Replace with real historical data from API
   const roomsTrendData = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 10) + 1);
+    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 10) + 1);
   }, []);
 
   const participantsTrendData = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 20) + 5);
+    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 5);
   }, []);
 
   const publishersTrendData = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => Math.floor(Math.random() * 8) + 1);
+    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 8) + 1);
   }, []);
 
   if (!isConfigComplete()) {
     return (
       <PageContainer>
         <div className="text-center py-12">
-          <div className="bg-card rounded-lg border shadow-sm p-8 max-w-2xl mx-auto">
-            <svg className="h-12 w-12 mx-auto text-muted-foreground mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m16.24-3.76l-4.24 4.24m-6-6L2.76 6.24m16.24 12.52l-4.24-4.24m-6 6L2.76 17.76"/>
-            </svg>
+          <div className="bg-card rounded-lg border shadow-sm p-8 max-w-2xl mx-auto fade-in">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-primary/10 rounded-full border border-primary/20">
+                <SettingsIcon className="h-12 w-12 text-primary" strokeWidth={1.5} />
+              </div>
+            </div>
             <h2 className="text-2xl font-semibold mb-2">Configuration Required</h2>
             <p className="text-muted-foreground mb-6">
               Please configure your LiveKit server settings before accessing the dashboard.
             </p>
             <a
               href="/settings"
-              className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow hover:bg-primary-hover transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow hover:bg-primary-hover transition-colors"
             >
+              <SettingsIcon className="h-4 w-4" strokeWidth={2} />
               Go to Settings
             </a>
           </div>
@@ -78,24 +73,13 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   return (
     <PageContainer>
       <div className="space-y-8">
-        {/* Page Header - Technical Excellence */}
+        {/* Page Header */}
         <div className="fade-in stagger-1">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b border-border relative">
-            {/* Corner brackets for technical feel */}
-            <div className="corner-brackets">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-4xl font-extrabold tracking-tight">MISSION CONTROL</h1>
-                  <span className="inline-flex items-center px-2 py-1 text-xs font-mono font-semibold rounded border border-primary/30 bg-primary/10 text-primary">
-                    LIVE
-                  </span>
-                </div>
-                <p className="text-muted-foreground text-base">
-                  Real-time infrastructure monitoring • LiveKit Dashboard
-                </p>
-              </div>
-            </div>
-            <LiveIndicator lastUpdated={lastUpdated} isRefreshing={isFetching && !isLoading} />
+          <div className="flex flex-col gap-2">
+            <h1 className="text-4xl font-extrabold tracking-tight">MISSION CONTROL</h1>
+            <p className="text-muted-foreground text-base">
+              Real-time infrastructure monitoring • LiveKit Dashboard
+            </p>
           </div>
         </div>
 
@@ -105,12 +89,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
             <MetricCard
               title="ACTIVE ROOMS"
               value={totalRooms}
-              icon={
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <path d="M3 9h18M9 21V9"/>
-                </svg>
-              }
+              icon={<LayoutGrid className="h-5 w-5" strokeWidth={2.5} />}
               iconColor="text-primary"
               trend={{ value: 12, isPositive: true }}
               chart={
@@ -129,13 +108,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
             <MetricCard
               title="PARTICIPANTS"
               value={totalParticipants}
-              icon={
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-              }
+              icon={<Users className="h-5 w-5" strokeWidth={2.5} />}
               iconColor="text-success"
               trend={{ value: 8, isPositive: true }}
               chart={
@@ -153,12 +126,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
             <MetricCard
               title="PUBLISHERS"
               value={totalPublishers}
-              icon={
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polygon points="23 7 16 12 23 17 23 7"/>
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
-              }
+              icon={<Video className="h-5 w-5" strokeWidth={2.5} />}
               iconColor="text-secondary"
               trend={{ value: 5, isPositive: false }}
               chart={
@@ -221,10 +189,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
                   className="p-2 rounded-md hover:bg-primary/10 border border-transparent hover:border-primary/30 transition-all"
                   aria-label="Close session diagnostics"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <X className="w-5 h-5" strokeWidth={2.5} />
                 </button>
               </div>
             </div>
@@ -237,10 +202,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-muted-foreground uppercase tracking-widest font-mono font-semibold">PARTICIPANTS</p>
                     <div className="p-1.5 bg-success/20 rounded">
-                      <svg className="h-3.5 w-3.5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                      </svg>
+                      <Users className="h-3.5 w-3.5 text-success" strokeWidth={2.5} />
                     </div>
                   </div>
                   <p className="text-3xl font-mono font-bold text-success counter-up">{selectedRoom.numParticipants}</p>
@@ -251,10 +213,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-muted-foreground uppercase tracking-widest font-mono font-semibold">PUBLISHERS</p>
                     <div className="p-1.5 bg-secondary/20 rounded">
-                      <svg className="h-3.5 w-3.5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <polygon points="23 7 16 12 23 17 23 7"/>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                      </svg>
+                      <Video className="h-3.5 w-3.5 text-secondary" strokeWidth={2.5} />
                     </div>
                   </div>
                   <p className="text-3xl font-mono font-bold text-secondary counter-up">{selectedRoom.numPublishers || 0}</p>
@@ -265,10 +224,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-muted-foreground uppercase tracking-widest font-mono font-semibold">CREATED</p>
                     <div className="p-1.5 bg-primary/20 rounded">
-                      <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                      </svg>
+                      <Clock className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
                     </div>
                   </div>
                   <p className="text-base font-mono font-semibold text-primary">{new Date(selectedRoom.creationTime * 1000).toLocaleTimeString()}</p>
@@ -279,10 +235,11 @@ export const Dashboard: React.FC<DashboardProps> = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-muted-foreground uppercase tracking-widest font-mono font-semibold">RECORDING</p>
                     <div className={`p-1.5 rounded ${selectedRoom.activeRecording ? 'bg-destructive/20 pulse-glow' : 'bg-muted/20'}`}>
-                      <svg className={`h-3.5 w-3.5 ${selectedRoom.activeRecording ? 'text-destructive' : 'text-muted-foreground'}`} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10" fill="none"/>
-                        <circle cx="12" cy="12" r="4" />
-                      </svg>
+                      <Circle
+                        className={`h-3.5 w-3.5 ${selectedRoom.activeRecording ? 'text-destructive' : 'text-muted-foreground'}`}
+                        fill="currentColor"
+                        strokeWidth={2}
+                      />
                     </div>
                   </div>
                   <p className={`text-lg font-mono font-bold uppercase ${selectedRoom.activeRecording ? 'text-destructive' : 'text-muted-foreground'}`}>
