@@ -2,7 +2,7 @@ import React from 'react';
 import { Settings, Activity, WifiOff, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../ui/ThemeToggle';
-import { ConnectionState } from '../../../types/sse';
+import type { ConnectionState } from '../../../types/sse';
 
 interface TopNavbarProps {
   lastUpdated?: Date;

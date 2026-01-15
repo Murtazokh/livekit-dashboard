@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { SSEMessage, ConnectionState } from '../../types/sse';
+import type { SSEMessage, ConnectionState } from '../../types/sse';
 import { roomsQueryKeys } from './useRooms';
 
 interface UseRealtimeEventsReturn {
