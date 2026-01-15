@@ -36,7 +36,7 @@ export const useRooms = (filters?: any) => {
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
     refetchOnWindowFocus: true, // Refetch when window regains focus
     refetchOnReconnect: true, // Refetch when reconnecting to network
-    refetchInterval: 5000, // Refetch every 5 seconds for real-time updates
+    refetchInterval: 30000, // Refetch every 30 seconds (temporary until SSE is implemented)
     refetchIntervalInBackground: false, // Pause polling when tab is not visible
     retry: (failureCount, error) => {
       // Don't retry on 4xx errors (client errors)

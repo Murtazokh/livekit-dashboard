@@ -102,6 +102,27 @@ npm run dev
 
 The dashboard will be available at **http://localhost:5173** 🎉
 
+### 🐳 Docker Deployment (Recommended)
+
+For production deployments or containerized environments:
+
+```bash
+# Development mode with hot reload
+docker compose up
+
+# Production mode
+docker compose -f docker-compose.prod.yml up -d
+```
+
+**Features:**
+- ✅ One-command startup
+- ✅ Hot reload for both frontend and backend
+- ✅ Automatic service networking
+- ✅ Production-optimized builds
+- ✅ Health checks included
+
+📖 **[Read Full Docker Guide →](./DOCKER.md)**
+
 ### Manual Setup
 
 <details>
@@ -213,8 +234,8 @@ Open your browser to **http://localhost:5173**
 
 ### For Users
 - [Quick Start Guide](#-quick-start)
+- [Docker Deployment Guide](./DOCKER.md)
 - [Configuration Guide](./docs/configuration.md) *(coming soon)*
-- [Deployment Guide](./docs/deployment.md) *(coming soon)*
 - [Troubleshooting](./docs/troubleshooting.md) *(coming soon)*
 
 ### For Developers
@@ -370,11 +391,12 @@ This project is built for the LiveKit community:
 - [x] Production-grade testing (114 tests)
 - [x] Clean Architecture implementation
 - [x] WebSocket URL support
+- [x] Docker deployment with hot reload
+- [x] Production Docker builds
 
 ### 🚧 In Progress
 - [ ] Component tests for UI layer
 - [ ] E2E tests with Playwright
-- [ ] Deployment documentation
 
 ### 📋 Planned Features
 - [ ] Historical data persistence
@@ -383,7 +405,6 @@ This project is built for the LiveKit community:
 - [ ] Participant management actions
 - [ ] Real-time notifications
 - [ ] Multi-language support
-- [ ] Docker deployment
 - [ ] Kubernetes manifests
 - [ ] Grafana dashboard export
 - [ ] Webhook configuration

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { TopNavbar } from './TopNavbar';
+import { useRealtimeEvents } from '../../hooks/useRealtimeEvents';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -27,6 +28,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Real-time events via SSE
+  const { connectionState, lastEvent, manualReconnect } = useRealtimeEvents();
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -54,7 +58,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navbar - Global controls */}
-      <TopNavbar lastUpdated={lastUpdated} isRefreshing={isRefreshing} />
+      <TopNavbar
+        lastUpdated={lastEvent || lastUpdated}
+        isRefreshing={isRefreshing}
+        connectionState={connectionState}
+        onManualReconnect={manualReconnect}
+      />
 
       {/* Mobile overlay */}
       {isMobile && isMobileSidebarOpen && (

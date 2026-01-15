@@ -1391,6 +1391,575 @@
 
 ---
 
+## Phase 13: Real-Time Updates with Webhooks + SSE
+
+> **Reference**: See REALTIME_IMPLEMENTATION.md for detailed technical guide
+> **Goal**: Replace polling with true real-time updates using LiveKit Webhooks + Server-Sent Events (SSE)
+> **Approach**: LiveKit Server → Webhooks → Backend → SSE → Frontend
+
+### 13.1 Planning & Design
+
+**Effort**: Low (1-2 hours) | **Priority**: Critical | **Value**: High
+
+- [x] Review LiveKit Webhooks documentation
+- [x] Review Server-Sent Events (SSE) specification
+- [x] Create detailed implementation plan in REALTIME_IMPLEMENTATION.md
+- [x] Define webhook event types to handle (room_started, room_finished, participant_joined, etc.)
+- [ ] Design SSE message format and protocol
+- [ ] Design error handling and reconnection strategy
+- [ ] Create architecture diagram for Webhook → SSE flow
+- [ ] Document security considerations (webhook signature verification)
+- [ ] Get team/stakeholder approval on approach
+
+### 13.2 Backend - Webhook Handler Implementation
+
+**Effort**: Medium (3-4 hours) | **Priority**: High | **Value**: High
+
+#### 13.2.1 Webhook Infrastructure
+- [ ] Create webhook router (`backend/src/routes/webhooks.ts`)
+- [ ] Install LiveKit webhook dependencies (`livekit-server-sdk/WebhookReceiver`)
+- [ ] Create webhook endpoint POST `/api/webhooks/livekit`
+- [ ] Implement webhook signature verification
+  - Extract authorization header
+  - Use WebhookReceiver to verify signature
+  - Reject invalid signatures with 400 response
+- [ ] Add webhook event logging (development mode only)
+- [ ] Create webhook types/interfaces (`backend/src/types/webhook.ts`)
+- [ ] Add webhook route to main API router
+- [ ] Test webhook endpoint responds with 200 OK
+
+#### 13.2.2 Webhook Event Processing
+- [ ] Implement event type parsing from webhook payload
+- [ ] Create event handler for `room_started`
+  - Log room creation
+  - Prepare broadcast data
+- [ ] Create event handler for `room_finished`
+  - Log room closure
+  - Prepare broadcast data
+- [ ] Create event handler for `participant_joined`
+  - Log participant join
+  - Prepare participant data for broadcast
+- [ ] Create event handler for `participant_left`
+  - Log participant leave
+  - Prepare participant data for broadcast
+- [ ] Create event handler for `track_published`
+  - Log track publication
+  - Prepare track data for broadcast
+- [ ] Create event handler for `track_unpublished`
+  - Log track unpublication
+  - Prepare track data for broadcast
+- [ ] Add error handling for unknown event types
+- [ ] Test each event handler with mock webhook data
+
+#### 13.2.3 Webhook Testing Setup
+- [ ] Create webhook test fixtures (`backend/src/test/__fixtures__/webhookFixtures.ts`)
+- [ ] Create mock webhook payloads for each event type
+- [ ] Write unit tests for webhook signature verification
+- [ ] Write unit tests for each event handler
+- [ ] Test webhook endpoint with valid signatures
+- [ ] Test webhook endpoint rejects invalid signatures
+- [ ] Test webhook endpoint handles malformed payloads
+
+### 13.3 Backend - Server-Sent Events (SSE) Implementation
+
+**Effort**: Medium (4-5 hours) | **Priority**: High | **Value**: High
+
+#### 13.3.1 SSE Infrastructure
+- [ ] Create SSE connection manager (`backend/src/services/sseManager.ts`)
+  - Implement Set to store active SSE client connections
+  - Implement addClient method
+  - Implement removeClient method
+  - Implement broadcast method to send events to all clients
+  - Implement getClientCount method
+  - Add connection ID generation (UUID)
+- [ ] Create SSE router (`backend/src/routes/sse.ts`)
+- [ ] Create SSE endpoint GET `/api/events`
+- [ ] Set proper SSE headers:
+  - Content-Type: text/event-stream
+  - Cache-Control: no-cache
+  - Connection: keep-alive
+  - X-Accel-Buffering: no (for nginx)
+- [ ] Implement client connection handling
+  - Add client to active connections
+  - Send initial "connected" event
+  - Attach client ID to connection
+- [ ] Implement client disconnection handling
+  - Listen for request 'close' event
+  - Remove client from active connections
+  - Log disconnection
+- [ ] Add SSE route to main API router
+- [ ] Test SSE endpoint accepts connections
+
+#### 13.3.2 SSE Message Broadcasting
+- [ ] Define SSE message format interface (`backend/src/types/sse.ts`)
+  ```typescript
+  interface SSEMessage {
+    type: string;
+    event: string;
+    data: any;
+    timestamp: number;
+  }
+  ```
+- [ ] Implement broadcastEvent method in SSE manager
+  - Format message as SSE protocol (`data: ${JSON.stringify(msg)}\n\n`)
+  - Iterate through all connected clients
+  - Send message to each client
+  - Handle write errors gracefully
+- [ ] Integrate webhook events with SSE broadcasting
+  - Call broadcast from webhook handler
+  - Map webhook events to SSE message types
+  - Transform webhook data for frontend consumption
+- [ ] Implement heartbeat/keep-alive mechanism
+  - Send comment lines every 30 seconds (`: heartbeat\n\n`)
+  - Prevent connection timeout
+  - Detect dead connections
+- [ ] Test broadcast reaches all connected clients
+- [ ] Test heartbeat mechanism keeps connections alive
+
+#### 13.3.3 SSE Security & Performance
+- [ ] Add authentication middleware to SSE endpoint (optional for v1)
+- [ ] Implement connection limit per user/IP
+  - Track connections per identifier
+  - Reject new connections if limit exceeded (429)
+  - Set max connections to 5 per user
+- [ ] Implement rate limiting for broadcasts
+  - Debounce rapid events (max 10 events/second)
+  - Batch events if needed
+- [ ] Add memory leak prevention
+  - Set maximum client limit (100 connections)
+  - Clean up dead connections periodically
+  - Monitor memory usage
+- [ ] Test SSE under load (simulate 50+ connections)
+- [ ] Test SSE with slow clients (don't block others)
+- [ ] Test SSE connection cleanup on server restart
+
+#### 13.3.4 SSE Testing
+- [ ] Write unit tests for SSE manager
+  - Test addClient/removeClient
+  - Test broadcast to multiple clients
+  - Test message formatting
+- [ ] Write integration tests for SSE endpoint
+  - Test connection establishment
+  - Test receiving events
+  - Test disconnection cleanup
+- [ ] Create SSE test utilities
+  - Helper to simulate SSE client
+  - Helper to parse SSE messages
+- [ ] Test SSE with concurrent connections
+- [ ] Test SSE error scenarios (client disconnect, server error)
+
+### 13.4 Frontend - SSE Client Implementation
+
+**Effort**: Medium (3-4 hours) | **Priority**: High | **Value**: High
+
+#### 13.4.1 SSE Hook Implementation
+- [ ] Create `useRealtimeEvents` hook (`frontend/src/presentation/hooks/useRealtimeEvents.ts`)
+- [ ] Implement EventSource connection
+  - Connect to `/api/events` endpoint
+  - Store EventSource instance in ref
+  - Handle connection states (connecting, connected, disconnected)
+- [ ] Implement connection event handlers
+  - onopen: Set isConnected to true
+  - onmessage: Parse and process SSE events
+  - onerror: Set isConnected to false, attempt reconnect
+- [ ] Parse SSE message data (JSON.parse)
+- [ ] Add type safety for SSE message structure
+- [ ] Implement cleanup on unmount
+  - Close EventSource connection
+  - Clear any pending reconnection timers
+- [ ] Test hook connects to SSE endpoint
+- [ ] Test hook handles connection states correctly
+
+#### 13.4.2 React Query Cache Invalidation
+- [ ] Get QueryClient instance in useRealtimeEvents hook
+- [ ] Implement cache invalidation for `room_started` event
+  - Invalidate ['rooms'] query key
+  - Trigger immediate refetch
+- [ ] Implement cache invalidation for `room_finished` event
+  - Invalidate ['rooms'] query key
+  - Trigger immediate refetch
+- [ ] Implement cache invalidation for `participant_joined` event
+  - Invalidate ['rooms', roomName] query key
+  - Invalidate ['participants', roomName] query key
+  - Trigger immediate refetch
+- [ ] Implement cache invalidation for `participant_left` event
+  - Invalidate ['rooms', roomName] query key
+  - Invalidate ['participants', roomName] query key
+  - Trigger immediate refetch
+- [ ] Implement cache invalidation for `track_published` event
+  - Invalidate ['participants', roomName] query key
+  - Trigger immediate refetch
+- [ ] Implement cache invalidation for `track_unpublished` event
+  - Invalidate ['participants', roomName] query key
+  - Trigger immediate refetch
+- [ ] Test cache invalidation triggers refetch
+- [ ] Test UI updates with new data
+
+#### 13.4.3 Reconnection Logic
+- [ ] Implement exponential backoff for reconnection
+  - Start with 1 second delay
+  - Double delay on each retry (max 30 seconds)
+  - Reset delay on successful connection
+- [ ] Implement reconnection attempt counter
+  - Track number of retries
+  - Give up after 10 failed attempts
+  - Show permanent error state
+- [ ] Add connection state to hook return value
+  ```typescript
+  {
+    isConnected: boolean;
+    connectionState: 'connecting' | 'connected' | 'disconnected' | 'error';
+    lastEvent: Date | null;
+  }
+  ```
+- [ ] Test reconnection after temporary disconnection
+- [ ] Test exponential backoff timing
+- [ ] Test permanent failure after max retries
+
+#### 13.4.4 SSE Client Testing
+- [ ] Write unit tests for useRealtimeEvents hook
+  - Test initial connection
+  - Test message handling
+  - Test disconnection
+  - Test reconnection logic
+- [ ] Mock EventSource API
+- [ ] Test cache invalidation triggers correctly
+- [ ] Test cleanup on unmount
+- [ ] Test error handling
+
+### 13.5 Frontend - UI Integration
+
+**Effort**: Low (2-3 hours) | **Priority**: Medium | **Value**: High
+
+#### 13.5.1 Connection Status Indicator
+- [ ] Update LiveIndicator component to use SSE connection state
+- [ ] Show different states:
+  - Connected (green pulsing dot + "LIVE")
+  - Connecting (yellow pulsing dot + "CONNECTING")
+  - Disconnected (gray dot + "DISCONNECTED")
+  - Error (red dot + "CONNECTION ERROR")
+- [ ] Add tooltip with connection details
+  - Last event timestamp
+  - Connection quality
+  - Event count
+- [ ] Add manual reconnect button (on error)
+- [ ] Style indicator to match design system
+- [ ] Test indicator updates with connection state changes
+
+#### 13.5.2 Dashboard Integration
+- [ ] Import and use useRealtimeEvents hook in Dashboard component
+- [ ] Remove or disable polling (keep as fallback for now)
+- [ ] Show real-time indicator in page header
+- [ ] Add optional event notification toast (on new rooms)
+- [ ] Test real-time updates appear without page refresh
+- [ ] Test UI remains responsive during updates
+
+#### 13.5.3 Fallback to Polling
+- [ ] Keep polling as fallback mechanism
+- [ ] Detect when SSE is unavailable
+  - Connection fails permanently
+  - Browser doesn't support EventSource
+  - Network conditions prevent SSE
+- [ ] Automatically enable polling on SSE failure
+- [ ] Show warning message when using polling fallback
+- [ ] Add user preference to disable real-time (use polling only)
+- [ ] Test fallback mechanism activates correctly
+- [ ] Test switching between SSE and polling
+
+### 13.6 LiveKit Webhook Configuration
+
+**Effort**: Low (1 hour) | **Priority**: Critical | **Value**: High
+
+#### 13.6.1 Local Development Setup
+- [ ] Install ngrok for local webhook testing (`npm install -g ngrok`)
+- [ ] Start ngrok tunnel to backend port 3001
+  ```bash
+  ngrok http 3001
+  ```
+- [ ] Get ngrok public URL (https://abc123.ngrok.io)
+- [ ] Document ngrok setup in DOCKER.md
+- [ ] Test ngrok tunnel is accessible
+- [ ] Test backend accessible via ngrok URL
+
+#### 13.6.2 LiveKit Server Configuration
+- [ ] For LiveKit Cloud:
+  - Go to project settings
+  - Navigate to Webhooks section
+  - Add webhook URL: `https://your-domain.com/api/webhooks/livekit`
+  - Select all relevant events to receive
+  - Save configuration
+- [ ] For Self-Hosted LiveKit:
+  - Edit `livekit.yaml` configuration file
+  - Add webhook configuration:
+    ```yaml
+    webhook:
+      urls:
+        - https://your-domain.com/api/webhooks/livekit
+      api_key: your-livekit-api-key
+    ```
+  - Restart LiveKit server
+- [ ] Test webhook delivery with test event
+- [ ] Verify webhook appears in backend logs
+- [ ] Test signature verification works
+
+#### 13.6.3 Production Webhook Setup
+- [ ] Set up production domain/URL
+- [ ] Configure HTTPS/SSL certificate
+- [ ] Add webhook URL to LiveKit production configuration
+- [ ] Test webhook delivery in production
+- [ ] Monitor webhook logs for errors
+- [ ] Set up alerting for webhook failures
+
+### 13.7 Integration Testing
+
+**Effort**: Medium (3-4 hours) | **Priority**: High | **Value**: Critical
+
+#### 13.7.1 End-to-End Real-Time Flow Testing
+- [ ] Test complete flow: LiveKit event → Webhook → SSE → Frontend
+- [ ] Create test room in LiveKit
+  - Trigger room_started event
+  - Verify webhook received
+  - Verify SSE broadcast
+  - Verify frontend receives event
+  - Verify UI updates with new room
+- [ ] Add participant to test room
+  - Trigger participant_joined event
+  - Verify event flow through system
+  - Verify participant count updates in UI
+- [ ] Publish track in test room
+  - Trigger track_published event
+  - Verify event flow
+  - Verify publisher count updates
+- [ ] Remove participant from test room
+  - Trigger participant_left event
+  - Verify event flow
+  - Verify UI updates
+- [ ] Close test room
+  - Trigger room_finished event
+  - Verify event flow
+  - Verify room removed from UI
+
+#### 13.7.2 Multiple Client Testing
+- [ ] Open dashboard in 2+ browser tabs
+- [ ] Verify all tabs receive SSE events
+- [ ] Trigger room event in LiveKit
+- [ ] Verify all tabs update simultaneously
+- [ ] Close one tab
+- [ ] Verify other tabs still receive events
+- [ ] Test with 5+ concurrent clients
+
+#### 13.7.3 Network Resilience Testing
+- [ ] Test SSE reconnection after network interruption
+  - Disconnect network
+  - Wait 10 seconds
+  - Reconnect network
+  - Verify SSE reconnects automatically
+  - Verify events resume flowing
+- [ ] Test SSE behavior with slow network
+  - Throttle network to 3G
+  - Verify events still arrive (may be delayed)
+  - Verify no connection drops
+- [ ] Test webhook retry behavior
+  - Simulate backend downtime
+  - Verify LiveKit retries webhook delivery
+  - Verify events not lost
+
+#### 13.7.4 Error Scenario Testing
+- [ ] Test invalid webhook signature
+  - Send webhook with bad signature
+  - Verify backend rejects with 400
+  - Verify error logged
+- [ ] Test SSE client limit reached
+  - Connect maximum allowed clients
+  - Attempt to connect one more
+  - Verify connection rejected with 429
+- [ ] Test malformed webhook payload
+  - Send invalid JSON
+  - Verify backend handles gracefully
+  - Verify no crash
+- [ ] Test frontend handles SSE errors
+  - Simulate SSE server error
+  - Verify frontend shows error state
+  - Verify fallback to polling works
+
+### 13.8 Performance Optimization
+
+**Effort**: Medium (2-3 hours) | **Priority**: Medium | **Value**: Medium
+
+#### 13.8.1 Backend Optimization
+- [ ] Implement event batching
+  - Batch rapid events within 100ms window
+  - Reduce SSE message flood
+- [ ] Implement selective event filtering
+  - Allow clients to subscribe to specific event types
+  - Only send relevant events to each client
+- [ ] Optimize broadcast performance
+  - Use async iteration for client broadcast
+  - Avoid blocking on slow clients
+- [ ] Add performance monitoring
+  - Track SSE connection count
+  - Track event broadcast latency
+  - Log performance metrics
+
+#### 13.8.2 Frontend Optimization
+- [ ] Debounce rapid cache invalidations
+  - Prevent excessive refetches
+  - Batch invalidations within 500ms
+- [ ] Implement optimistic UI updates
+  - Update UI immediately on event
+  - Validate with server data
+  - Rollback if mismatch
+- [ ] Add event deduplication
+  - Track recent event IDs
+  - Ignore duplicate events
+- [ ] Optimize React re-renders
+  - Use React.memo for LiveIndicator
+  - Use useMemo for event processing
+
+#### 13.8.3 Load Testing
+- [ ] Test backend with 100 concurrent SSE connections
+- [ ] Test webhook handler with 100 req/sec
+- [ ] Measure SSE broadcast latency (should be <50ms)
+- [ ] Measure end-to-end latency (webhook → UI update)
+  - Target: <200ms for 95th percentile
+- [ ] Test memory usage over 24 hours
+  - Verify no memory leaks
+  - Monitor connection cleanup
+- [ ] Document performance benchmarks
+
+### 13.9 Monitoring & Observability
+
+**Effort**: Low (2 hours) | **Priority**: Medium | **Value**: Medium
+
+#### 13.9.1 Logging
+- [ ] Add structured logging for webhooks
+  - Log event type
+  - Log room/participant IDs
+  - Log processing time
+- [ ] Add structured logging for SSE
+  - Log client connections/disconnections
+  - Log broadcast events
+  - Log errors
+- [ ] Configure log levels (debug, info, warn, error)
+- [ ] Add log rotation (production)
+- [ ] Test logs are useful for debugging
+
+#### 13.9.2 Metrics
+- [ ] Add metric: Active SSE connections count
+- [ ] Add metric: Webhooks received count
+- [ ] Add metric: Webhook processing latency
+- [ ] Add metric: SSE broadcast latency
+- [ ] Add metric: Event types distribution
+- [ ] Expose metrics endpoint (optional)
+  - GET `/api/metrics`
+  - Return metrics as JSON
+  - Secure with authentication
+
+#### 13.9.3 Health Checks
+- [ ] Update health endpoint to include SSE status
+  - Number of active connections
+  - Last webhook received timestamp
+  - SSE manager status
+- [ ] Add dedicated SSE health check endpoint
+  - GET `/api/events/health`
+  - Return connection count and status
+- [ ] Test health check endpoints
+
+### 13.10 Documentation
+
+**Effort**: Low (2-3 hours) | **Priority**: High | **Value**: High
+
+#### 13.10.1 Technical Documentation
+- [ ] Update REALTIME_IMPLEMENTATION.md with implementation details
+- [ ] Document SSE message format
+- [ ] Document webhook event types handled
+- [ ] Document reconnection logic and timing
+- [ ] Add architecture diagram
+- [ ] Document security considerations
+- [ ] Add troubleshooting section
+
+#### 13.10.2 User Documentation
+- [ ] Update README.md with real-time feature description
+- [ ] Add real-time setup instructions
+- [ ] Document LiveKit webhook configuration steps
+- [ ] Add FAQ section for real-time issues
+- [ ] Create video/GIF showing real-time updates
+
+#### 13.10.3 Developer Documentation
+- [ ] Document how to test webhooks locally (ngrok)
+- [ ] Document how to add new event handlers
+- [ ] Document SSE client hook usage
+- [ ] Add code examples for common scenarios
+- [ ] Document performance considerations
+
+### 13.11 Deployment & Rollout
+
+**Effort**: Low (1-2 hours) | **Priority**: High | **Value**: Critical
+
+#### 13.11.1 Staging Deployment
+- [ ] Deploy backend changes to staging
+- [ ] Deploy frontend changes to staging
+- [ ] Configure LiveKit staging webhooks
+- [ ] Test complete flow in staging
+- [ ] Verify no regressions in existing features
+- [ ] Test with real staging LiveKit server
+
+#### 13.11.2 Production Rollout Strategy
+- [ ] Create feature flag for real-time updates
+  - Allow enable/disable without redeployment
+  - Default to disabled initially
+- [ ] Deploy to production with feature disabled
+- [ ] Enable feature for internal testing (10% of users)
+- [ ] Monitor metrics and errors
+- [ ] Gradually increase rollout (25%, 50%, 100%)
+- [ ] Keep polling as fallback during rollout
+
+#### 13.11.3 Rollback Plan
+- [ ] Document rollback procedure
+  - Disable feature flag
+  - Verify polling fallback works
+  - Revert deployments if needed
+- [ ] Test rollback in staging
+- [ ] Prepare rollback communication plan
+- [ ] Monitor key metrics during rollout
+
+#### 13.11.4 Post-Deployment Monitoring
+- [ ] Monitor SSE connection count
+- [ ] Monitor webhook delivery success rate
+- [ ] Monitor event processing latency
+- [ ] Monitor frontend error rates
+- [ ] Set up alerts for anomalies
+- [ ] Review logs for issues
+
+### 13.12 Cleanup & Polish
+
+**Effort**: Low (1-2 hours) | **Priority**: Low | **Value**: Medium
+
+#### 13.12.1 Code Cleanup
+- [ ] Remove old polling code (if fully replaced)
+- [ ] Remove debug logging
+- [ ] Clean up commented code
+- [ ] Run linter and fix all warnings
+- [ ] Optimize imports
+- [ ] Add final code comments
+
+#### 13.12.2 Testing Cleanup
+- [ ] Ensure all tests pass
+- [ ] Achieve >90% code coverage for new code
+- [ ] Remove obsolete tests
+- [ ] Update test fixtures
+- [ ] Document test setup
+
+#### 13.12.3 Final Verification
+- [ ] Test all event types work correctly
+- [ ] Test on all supported browsers
+- [ ] Test on mobile devices
+- [ ] Verify performance benchmarks met
+- [ ] Verify no memory leaks
+- [ ] Get final code review approval
+
+---
+
 ## Notes
 
 - Mark each task as completed only after testing confirms it works

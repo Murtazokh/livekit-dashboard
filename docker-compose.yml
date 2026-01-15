@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: livekit-dashboard-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=3001
+      - FRONTEND_URL=http://frontend:5173
+      # Optional LiveKit defaults (can be overridden via request headers)
+      - LIVEKIT_URL=${LIVEKIT_URL:-}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
+    dns:
+      # Use Google and Cloudflare DNS servers for reliable external resolution
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
+    volumes:
+      # Mount source for hot reload in development (read-write for hot reload)
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      # Exclude node_modules to avoid conflicts
+      - backend-node-modules:/app/node_modules
+    networks:
+      - livekit-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend web service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: livekit-dashboard-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      # Don't set VITE_API_URL - let vite.config.ts use the backend service name
+    dns:
+      # Use Google and Cloudflare DNS servers for reliable external resolution
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
+    volumes:
+      # Mount source for hot reload in development (read-write for hot reload)
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.app.json:/app/tsconfig.app.json
+      - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      # Exclude node_modules to avoid conflicts
+      - frontend-node-modules:/app/node_modules
+    networks:
+      - livekit-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  livekit-network:
+    driver: bridge
+    name: livekit-dashboard-network
+
+volumes:
+  backend-node-modules:
+    name: livekit-dashboard-backend-node-modules
+  frontend-node-modules:
+    name: livekit-dashboard-frontend-node-modules

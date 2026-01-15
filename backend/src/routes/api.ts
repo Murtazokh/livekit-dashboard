@@ -6,6 +6,11 @@ import { extractLiveKitConfig } from '../middleware/extractLiveKitConfig';
 
 const router = express.Router();
 
+// GET /api/health - health check endpoint
+router.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // POST /api/config/validate - validate LiveKit configuration
 router.post('/config/validate', validateConfig, rateLimit, async (req, res) => {
   try {

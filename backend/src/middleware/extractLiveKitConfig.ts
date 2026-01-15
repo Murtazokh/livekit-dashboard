@@ -23,12 +23,15 @@ export const extractLiveKitConfig = (req: Request, _res: Response, next: NextFun
   const apiKey = req.headers['x-livekit-key'] as string;
   const apiSecret = req.headers['x-livekit-secret'] as string;
 
-  console.log('Extracting LiveKit config:', {
-    host: host ? '[REDACTED]' : undefined,
-    hasApiKey: !!apiKey,
-    hasApiSecret: !!apiSecret,
-    allHeaders: Object.keys(req.headers).filter(h => h.toLowerCase().includes('livekit'))
-  });
+  // Only log in development mode and only on first request
+  const isDev = process.env.NODE_ENV === 'development';
+  const shouldLog = isDev && Math.random() < 0.01; // Log ~1% of requests in dev
+
+  if (shouldLog) {
+    console.log('LiveKit config status:', {
+      hasConfig: !!(host && apiKey && apiSecret)
+    });
+  }
 
   if (host && apiKey && apiSecret) {
     // Convert WebSocket URLs to HTTP URLs for the SDK
@@ -44,10 +47,6 @@ export const extractLiveKitConfig = (req: Request, _res: Response, next: NextFun
       apiKey,
       apiSecret
     };
-
-    console.log('LiveKit config extracted successfully');
-  } else {
-    console.log('LiveKit config not found in headers');
   }
 
   next();

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Backend API service (Production)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: livekit-dashboard-backend-prod
+    restart: always
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      # Optional LiveKit defaults (can be overridden via request headers)
+      - LIVEKIT_URL=${LIVEKIT_URL:-}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
+    dns:
+      # Use Google and Cloudflare DNS servers for reliable external resolution
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
+    networks:
+      - livekit-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend web service (Production with nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: livekit-dashboard-frontend-prod
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    dns:
+      # Use Google and Cloudflare DNS servers for reliable external resolution
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
+    networks:
+      - livekit-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  livekit-network:
+    driver: bridge
+    name: livekit-dashboard-network-prod

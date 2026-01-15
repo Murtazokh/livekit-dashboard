@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import apiRoutes from './routes/api';
+import sseRoutes from './routes/sse';
+import webhookRoutes from './routes/webhooks';
+import { extractLiveKitConfig } from './middleware/extractLiveKitConfig';
 
 dotenv.config();
 
@@ -17,7 +20,18 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json({ limit: '10mb' }));
+// Parse JSON bodies - also accept LiveKit's webhook content type
+// Capture raw body for webhook signature verification
+app.use(express.json({
+  limit: '10mb',
+  type: ['application/json', 'application/webhook+json'],
+  verify: (req: any, _res, buf) => {
+    // Store raw body for webhook signature verification
+    if (req.url && req.url.includes('/webhooks/')) {
+      req.rawBody = buf.toString('utf8');
+    }
+  }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger);
@@ -29,6 +43,13 @@ app.get('/health', (_req, res) => {
 
 // API routes
 app.use('/api', apiRoutes);
+
+// SSE routes (real-time events)
+app.use('/api', sseRoutes);
+
+// Webhook routes (LiveKit event ingestion)
+// Apply LiveKit config extraction middleware for webhook auth
+app.use('/api/webhooks', extractLiveKitConfig, webhookRoutes);
 
 // Health check and root
 app.get('/', (_req, res) => {

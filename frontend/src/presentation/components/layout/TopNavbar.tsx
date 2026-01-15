@@ -1,18 +1,27 @@
 import React from 'react';
-import { Settings, Activity } from 'lucide-react';
+import { Settings, Activity, WifiOff, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { ConnectionState } from '../../../types/sse';
 
 interface TopNavbarProps {
   lastUpdated?: Date;
   isRefreshing?: boolean;
+  // Real-time connection props
+  connectionState?: ConnectionState;
+  onManualReconnect?: () => void;
 }
 
 /**
  * Top navigation bar following SaaS best practices
  * Contains global controls: theme toggle, settings, status indicators
  */
-export const TopNavbar: React.FC<TopNavbarProps> = ({ lastUpdated, isRefreshing }) => {
+export const TopNavbar: React.FC<TopNavbarProps> = ({
+  lastUpdated,
+  isRefreshing,
+  connectionState = 'disconnected',
+  onManualReconnect,
+}) => {
   const formatLastUpdated = (date?: Date) => {
     if (!date) return 'Never';
     const now = new Date();
@@ -22,6 +31,43 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ lastUpdated, isRefreshing 
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     return date.toLocaleTimeString();
   };
+
+  // Get status display based on connection state
+  const getConnectionStatus = () => {
+    switch (connectionState) {
+      case 'connected':
+        return {
+          icon: Activity,
+          iconColor: 'text-success',
+          label: 'LIVE',
+          showPulse: true,
+        };
+      case 'connecting':
+        return {
+          icon: RefreshCw,
+          iconColor: 'text-warning',
+          label: 'CONNECTING',
+          showPulse: true,
+        };
+      case 'disconnected':
+        return {
+          icon: WifiOff,
+          iconColor: 'text-muted-foreground',
+          label: 'DISCONNECTED',
+          showPulse: false,
+        };
+      case 'error':
+        return {
+          icon: WifiOff,
+          iconColor: 'text-destructive',
+          label: 'ERROR',
+          showPulse: false,
+        };
+    }
+  };
+
+  const status = getConnectionStatus();
+  const StatusIcon = status.icon;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -43,20 +89,38 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ lastUpdated, isRefreshing 
 
         {/* Right: Global Controls */}
         <div className="flex items-center gap-3">
-          {/* Live Status Indicator */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-card border border-border">
+          {/* Live Status Indicator with SSE Connection State */}
+          <div
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md bg-card border border-border ${
+              connectionState === 'error' ? 'cursor-pointer hover:bg-card-hover' : ''
+            }`}
+            onClick={connectionState === 'error' ? onManualReconnect : undefined}
+            title={
+              connectionState === 'error'
+                ? 'Click to retry connection'
+                : connectionState === 'connected'
+                  ? 'Real-time updates active'
+                  : connectionState === 'connecting'
+                    ? 'Connecting to server...'
+                    : 'Disconnected from server'
+            }
+          >
             <div className="relative flex items-center">
-              <Activity className={`h-4 w-4 ${isRefreshing ? 'text-primary' : 'text-success'}`} />
-              {isRefreshing && (
+              <StatusIcon
+                className={`h-4 w-4 ${status.iconColor} ${connectionState === 'connecting' ? 'animate-spin' : ''}`}
+              />
+              {status.showPulse && (
                 <span className="absolute inset-0">
-                  <span className="absolute inset-0 rounded-full bg-primary opacity-75 animate-ping"></span>
+                  <span
+                    className={`absolute inset-0 rounded-full opacity-75 animate-ping ${
+                      connectionState === 'connected' ? 'bg-success' : 'bg-warning'
+                    }`}
+                  ></span>
                 </span>
               )}
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-mono font-semibold leading-none">
-                {isRefreshing ? 'UPDATING' : 'LIVE'}
-              </span>
+              <span className="text-xs font-mono font-semibold leading-none">{status.label}</span>
               <span className="text-[10px] text-muted-foreground leading-none mt-0.5">
                 {formatLastUpdated(lastUpdated)}
               </span>

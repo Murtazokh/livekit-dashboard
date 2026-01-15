@@ -12,9 +12,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // Listen on all network interfaces for Docker
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        // Use backend service name in Docker, fallback to localhost for local development
+        target: process.env.VITE_API_URL || 'http://backend:3001',
         changeOrigin: true,
       },
     },
