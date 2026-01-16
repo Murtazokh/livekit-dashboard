@@ -470,6 +470,14 @@ Please [open an issue](https://github.com/Murtazokh/livekit-dashboard/issues/new
 
 **Note**: This is an independent community project and is not officially affiliated with LiveKit, Inc.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Murtazokh/livekit-dashboard&type=Date)](https://star-history.com/#Murtazokh/livekit-dashboard&Date)
+## Star History
+
+<a href="https://star-history.com/#Murtazokh/livekit-dashboard&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Murtazokh/livekit-dashboard&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Murtazokh/livekit-dashboard&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Murtazokh/livekit-dashboard&type=Date" />
+  </picture>
+</a>
 
 </div>
