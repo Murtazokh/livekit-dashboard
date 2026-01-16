@@ -51,6 +51,41 @@ export class ApiClient implements ILiveKitService {
     }
   }
 
+  async getAllAgents(): Promise<Agent[]> {
+    try {
+      const response = await this.makeRequest<ApiResponse<Agent[]>>('/agents');
+      return response.data || [];
+    } catch (error) {
+      console.error('Failed to get all agents:', error);
+      return [];
+    }
+  }
+
+  async createAgentDispatch(
+    roomName: string,
+    agentName: string,
+    metadata?: string
+  ): Promise<{ id: string; agentName: string; room: string; metadata?: string }> {
+    const response = await this.makeRequest<ApiResponse<{ id: string; agentName: string; room: string; metadata?: string }>>(
+      '/agents/dispatch',
+      {
+        method: 'POST',
+        body: JSON.stringify({ roomName, agentName, metadata }),
+      }
+    );
+    return response.data!;
+  }
+
+  async deleteAgentDispatch(dispatchId: string, roomName: string): Promise<void> {
+    await this.makeRequest<ApiResponse<void>>(
+      `/agents/dispatch/${encodeURIComponent(dispatchId)}`,
+      {
+        method: 'DELETE',
+        body: JSON.stringify({ roomName }),
+      }
+    );
+  }
+
   /**
    * Validate server configuration
    * @param config - Configuration to validate

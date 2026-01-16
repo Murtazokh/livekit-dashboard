@@ -4,6 +4,7 @@ import { AppLayout } from './presentation/components/layout/AppLayout';
 import { Settings } from './presentation/pages/Settings';
 import { Dashboard } from './presentation/pages/Dashboard';
 import { Sessions } from './presentation/pages/Sessions';
+import { Agents } from './presentation/pages/Agents';
 
 /**
  * Main application component with routing and AppLayout
@@ -14,6 +15,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
         <Route path="/sessions" element={<AppLayout><Sessions /></AppLayout>} />
+        <Route path="/agents" element={<AppLayout><Agents /></AppLayout>} />
         <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
       </Routes>
     </Router>

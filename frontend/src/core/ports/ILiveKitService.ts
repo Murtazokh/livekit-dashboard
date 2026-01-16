@@ -40,4 +40,31 @@ export interface ILiveKitService {
    * @returns Promise resolving to array of agents
    */
   getAgents(roomName?: string): Promise<Agent[]>;
+
+  /**
+   * Get all agent dispatches across all rooms
+   * @returns Promise resolving to array of all agent dispatches
+   */
+  getAllAgents(): Promise<Agent[]>;
+
+  /**
+   * Create a new agent dispatch for a room
+   * @param roomName - Name of the room
+   * @param agentName - Name of the agent to dispatch
+   * @param metadata - Optional metadata for the agent
+   * @returns Promise resolving to the created dispatch
+   */
+  createAgentDispatch(
+    roomName: string,
+    agentName: string,
+    metadata?: string
+  ): Promise<{ id: string; agentName: string; room: string; metadata?: string }>;
+
+  /**
+   * Delete an agent dispatch
+   * @param dispatchId - ID of the dispatch to delete
+   * @param roomName - Name of the room
+   * @returns Promise resolving when deletion is complete
+   */
+  deleteAgentDispatch(dispatchId: string, roomName: string): Promise<void>;
 }

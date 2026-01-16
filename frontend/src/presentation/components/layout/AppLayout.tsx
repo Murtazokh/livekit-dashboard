@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
-import { Header } from './Header';
 import { TopNavbar } from './TopNavbar';
 import { useRealtimeEvents } from '../../hooks/useRealtimeEvents';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  pageTitle?: string;
-  pageSubtitle?: string;
-  headerActions?: React.ReactNode;
   lastUpdated?: Date;
   isRefreshing?: boolean;
 }
@@ -19,9 +15,6 @@ interface AppLayoutProps {
  */
 export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
-  pageTitle,
-  pageSubtitle,
-  headerActions,
   lastUpdated,
   isRefreshing,
 }) => {
@@ -56,31 +49,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Navbar - Global controls */}
-      <TopNavbar
-        lastUpdated={lastEvent || lastUpdated}
-        isRefreshing={isRefreshing}
-        connectionState={connectionState}
-        onManualReconnect={manualReconnect}
-      />
-
+    <div className="min-h-screen bg-background flex">
       {/* Mobile overlay */}
       {isMobile && isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 mt-16"
+          className="fixed inset-0 bg-black/50 z-30"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar - Below top navbar */}
+      {/* Sidebar - Full height on desktop */}
       <div
         className={`
           ${isMobile ? 'fixed z-40' : 'fixed'}
           ${isMobile && !isMobileSidebarOpen ? '-translate-x-full' : 'translate-x-0'}
           transition-transform duration-300
-          top-16
-          h-[calc(100vh-4rem)]
+          top-0
+          h-screen
         `}
       >
         <Sidebar
@@ -92,39 +77,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       {/* Main content area */}
       <div
         className={`
+          flex-1
           transition-all duration-300
-          pt-16
           ${isMobile ? 'ml-0' : isSidebarCollapsed ? 'ml-16' : 'ml-64'}
         `}
       >
-        {/* Mobile menu button */}
-        {isMobile && (
-          <div className="fixed top-20 left-4 z-20">
-            <button
-              onClick={() => setIsMobileSidebarOpen(true)}
-              className="p-2 rounded-md bg-card border border-border shadow-md hover:bg-card-hover transition-colors"
-              aria-label="Open menu"
-            >
-              <svg
-                className="w-6 h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
-        )}
-
-        {/* Header */}
-        <Header title={pageTitle} subtitle={pageSubtitle} actions={headerActions} />
+        {/* Top Navbar - Global controls */}
+        <TopNavbar
+          lastUpdated={lastEvent || lastUpdated}
+          isRefreshing={isRefreshing}
+          connectionState={connectionState}
+          onManualReconnect={manualReconnect}
+          isMobile={isMobile}
+          onToggleMobileMenu={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        />
 
         {/* Page content */}
-        <main className="min-h-[calc(100vh-73px-4rem)]">{children}</main>
+        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
       </div>
     </div>
   );

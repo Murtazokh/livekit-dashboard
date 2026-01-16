@@ -40,6 +40,7 @@ export interface Agent {
   roomName?: string;
   participantSid?: string;
   metadata?: string;
+  config?: any; // Parsed configuration from metadata
   startedAt: number;
   lastActivityAt: number;
 }
@@ -138,16 +139,30 @@ export class LiveKitService {
       }
 
       const dispatches = await this.agentClient.listDispatch(roomName);
-      return dispatches.map(dispatch => ({
-        id: dispatch.id,
-        name: dispatch.agentName,
-        type: 'UNKNOWN', // SDK doesn't provide type info
-        state: 'ACTIVE', // Assume active if dispatched
-        roomName: dispatch.room, // Correct property name
-        metadata: dispatch.metadata,
-        startedAt: Date.now() / 1000,
-        lastActivityAt: Date.now() / 1000,
-      }));
+      return dispatches.map(dispatch => {
+        // Try to parse metadata as JSON to extract configuration
+        let config = undefined;
+        if (dispatch.metadata) {
+          try {
+            config = JSON.parse(dispatch.metadata);
+          } catch (e) {
+            // If metadata is not JSON, leave it as string
+            console.debug('Agent metadata is not JSON:', dispatch.metadata);
+          }
+        }
+
+        return {
+          id: dispatch.id,
+          name: dispatch.agentName,
+          type: config?.type || 'UNKNOWN', // Try to get type from config
+          state: 'ACTIVE', // Assume active if dispatched
+          roomName: dispatch.room,
+          metadata: dispatch.metadata,
+          config, // Include parsed configuration
+          startedAt: Date.now() / 1000,
+          lastActivityAt: Date.now() / 1000,
+        };
+      });
     } catch (error) {
       console.error(`Error getting agents for room ${roomName}:`, error);
       throw new Error(`Failed to get agents: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -189,6 +204,131 @@ export class LiveKitService {
     } catch (error) {
       console.error(`Error generating token for room ${roomName}:`, error);
       throw new Error(`Failed to generate token: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Create an agent dispatch for a specific room
+   * @param roomName - Name of the room
+   * @param agentName - Name of the agent to dispatch
+   * @param metadata - Optional metadata for the agent
+   * @returns The created dispatch object
+   */
+  async createAgentDispatch(
+    roomName: string,
+    agentName: string,
+    metadata?: string
+  ): Promise<{ id: string; agentName: string; room: string; metadata?: string }> {
+    try {
+      const dispatch = await this.agentClient.createDispatch(roomName, agentName, { metadata });
+      return {
+        id: dispatch.id,
+        agentName: dispatch.agentName,
+        room: dispatch.room,
+        metadata: dispatch.metadata,
+      };
+    } catch (error) {
+      console.error(`Error creating agent dispatch for room ${roomName}:`, error);
+      throw new Error(`Failed to create agent dispatch: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Delete an agent dispatch
+   * @param dispatchId - ID of the dispatch to delete
+   * @param roomName - Name of the room
+   */
+  async deleteAgentDispatch(dispatchId: string, roomName: string): Promise<void> {
+    try {
+      await this.agentClient.deleteDispatch(dispatchId, roomName);
+    } catch (error) {
+      console.error(`Error deleting agent dispatch ${dispatchId}:`, error);
+      throw new Error(`Failed to delete agent dispatch: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Get all agent dispatches across all rooms
+   * This is a helper method that lists dispatches for all active rooms
+   * Also includes agent participants from rooms
+   * @returns Array of all agent dispatches
+   */
+  async getAllAgentDispatches(): Promise<Agent[]> {
+    try {
+      // Get all rooms first
+      const rooms = await this.listRooms();
+
+      if (rooms.length === 0) {
+        console.log('No active rooms found');
+        return [];
+      }
+
+      // Get dispatches and participants for each room
+      const allAgents: Agent[] = [];
+      const seenAgentIds = new Set<string>();
+
+      for (const room of rooms) {
+        // Get explicit dispatches
+        try {
+          const dispatches = await this.getAgents(room.name);
+          for (const dispatch of dispatches) {
+            if (!seenAgentIds.has(dispatch.id)) {
+              allAgents.push(dispatch);
+              seenAgentIds.add(dispatch.id);
+            }
+          }
+        } catch (dispatchError) {
+          console.debug(`No dispatches for room ${room.name}:`, dispatchError);
+        }
+
+        // Also check participants for agents (agents join as special participants)
+        try {
+          const participants = await this.listParticipants(room.name);
+          for (const participant of participants) {
+            // Agent participants typically have metadata indicating they're agents
+            // or their identity follows a pattern like "agent-*"
+            const isAgent =
+              participant.identity.startsWith('agent-') ||
+              participant.identity.startsWith('agent_') ||
+              participant.name?.toLowerCase().includes('agent') ||
+              (participant.metadata && participant.metadata.includes('agent'));
+
+            if (isAgent && !seenAgentIds.has(participant.sid)) {
+              // Convert participant to Agent format
+              const agentFromParticipant: Agent = {
+                id: participant.sid,
+                name: participant.name || participant.identity,
+                type: 'UNKNOWN',
+                state: participant.state === 'ACTIVE' ? 'ACTIVE' : 'DISCONNECTED',
+                roomName: room.name,
+                participantSid: participant.sid,
+                metadata: participant.metadata,
+                startedAt: participant.joinedAt,
+                lastActivityAt: participant.joinedAt,
+              };
+
+              // Try to parse metadata
+              if (participant.metadata) {
+                try {
+                  agentFromParticipant.config = JSON.parse(participant.metadata);
+                } catch (e) {
+                  // Metadata not JSON
+                }
+              }
+
+              allAgents.push(agentFromParticipant);
+              seenAgentIds.add(participant.sid);
+            }
+          }
+        } catch (participantError) {
+          console.debug(`Error getting participants for room ${room.name}:`, participantError);
+        }
+      }
+
+      return allAgents;
+    } catch (error) {
+      console.error('Error getting all agent dispatches:', error);
+      throw new Error(`Failed to get all agent dispatches: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }

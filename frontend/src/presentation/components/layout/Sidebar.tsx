@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutGrid, Video, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutGrid, Video, Bot, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
   isCollapsed?: boolean;
@@ -32,6 +32,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleC
       icon: <Video className="w-5 h-5" strokeWidth={2} />,
     },
     {
+      path: '/agents',
+      label: 'Agent Sessions',
+      icon: <Bot className="w-5 h-5" strokeWidth={2} />,
+    },
+    {
       path: '/settings',
       label: 'Settings',
       icon: <Settings className="w-5 h-5" strokeWidth={2} />,
@@ -53,27 +58,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleC
         transition-all duration-300 ease-in-out
         ${isCollapsed ? 'w-16' : 'w-64'}
         flex flex-col
+        group/sidebar
       `}
     >
-      {/* Collapse Toggle */}
-      <div className="flex items-center justify-end px-2 py-3 border-b border-border">
+      {/* Brand Section with Collapse Toggle */}
+      <div className="flex items-center justify-between px-4 py-4 relative">
+        {/* Brand - Hidden when collapsed */}
+        {!isCollapsed && (
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 border border-primary/20">
+              <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.31-0.78-6-4.42-6-8V8.3l6-3.11v14.81z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-sm font-bold leading-none">LiveKit</h1>
+              <p className="text-xs text-muted-foreground leading-none mt-0.5">Dashboard</p>
+            </div>
+          </Link>
+        )}
+
+        {/* Collapse Toggle - Appears on hover */}
         {onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
-            className="p-2 rounded-md hover:bg-muted transition-colors group"
+            className={`
+              p-1.5 rounded-md hover:bg-muted transition-all
+              opacity-0 group-hover/sidebar:opacity-100
+              ${isCollapsed ? 'mx-auto' : 'absolute right-2'}
+            `}
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground" strokeWidth={2} />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
             ) : (
-              <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-foreground" strokeWidth={2} />
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
             )}
           </button>
         )}
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 px-2 py-4 space-y-1">
+      <nav className="flex-1 px-2 py-2 space-y-1">
         {navItems.map((item) => {
           const active = isActive(item.path);
           return (

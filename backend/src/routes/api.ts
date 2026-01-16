@@ -201,4 +201,104 @@ router.post('/rooms/:roomName/token', extractLiveKitConfig, rateLimit, async (re
   }
 });
 
+// GET /api/agents - list all agent dispatches across all rooms
+router.get('/agents', extractLiveKitConfig, rateLimit, async (req, res, next) => {
+  try {
+    const config = req.livekitConfig || {
+      host: process.env.LIVEKIT_HOST || 'http://localhost:7880',
+      apiKey: process.env.LIVEKIT_API_KEY || 'devkey',
+      apiSecret: process.env.LIVEKIT_API_SECRET || 'secret',
+    };
+
+    const service = new LiveKitService(config);
+    const agents = await service.getAllAgentDispatches();
+
+    console.log(`Found ${agents.length} agents across all rooms`);
+
+    res.json({
+      success: true,
+      data: agents,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/agents/dispatch - create a new agent dispatch
+router.post('/agents/dispatch', extractLiveKitConfig, rateLimit, async (req, res, next) => {
+  try {
+    const { roomName, agentName, metadata } = req.body;
+    const config = req.livekitConfig || {
+      host: process.env.LIVEKIT_HOST || 'http://localhost:7880',
+      apiKey: process.env.LIVEKIT_API_KEY || 'devkey',
+      apiSecret: process.env.LIVEKIT_API_SECRET || 'secret',
+    };
+
+    if (!roomName) {
+      res.status(400).json({
+        success: false,
+        error: 'Room name is required',
+      });
+      return;
+    }
+
+    if (!agentName) {
+      res.status(400).json({
+        success: false,
+        error: 'Agent name is required',
+      });
+      return;
+    }
+
+    const service = new LiveKitService(config);
+    const dispatch = await service.createAgentDispatch(roomName, agentName, metadata);
+
+    res.json({
+      success: true,
+      data: dispatch,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/agents/dispatch/:dispatchId - delete an agent dispatch
+router.delete('/agents/dispatch/:dispatchId', extractLiveKitConfig, rateLimit, async (req, res, next) => {
+  try {
+    const { dispatchId } = req.params;
+    const { roomName } = req.body;
+    const config = req.livekitConfig || {
+      host: process.env.LIVEKIT_HOST || 'http://localhost:7880',
+      apiKey: process.env.LIVEKIT_API_KEY || 'devkey',
+      apiSecret: process.env.LIVEKIT_API_SECRET || 'secret',
+    };
+
+    if (!dispatchId) {
+      res.status(400).json({
+        success: false,
+        error: 'Dispatch ID is required',
+      });
+      return;
+    }
+
+    if (!roomName) {
+      res.status(400).json({
+        success: false,
+        error: 'Room name is required',
+      });
+      return;
+    }
+
+    const service = new LiveKitService(config);
+    await service.deleteAgentDispatch(dispatchId, roomName);
+
+    res.json({
+      success: true,
+      message: 'Agent dispatch deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

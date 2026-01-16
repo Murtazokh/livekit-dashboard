@@ -23,6 +23,39 @@ export const AgentType = {
 
 export type AgentType = (typeof AgentType)[keyof typeof AgentType];
 
+/**
+ * Agent configuration stored in metadata
+ */
+export interface AgentConfiguration {
+  /** System instructions for the agent */
+  instructions?: string;
+
+  /** LLM configuration */
+  llm?: {
+    provider: string; // e.g., "openai", "anthropic", "groq"
+    model: string; // e.g., "gpt-4", "claude-3-opus"
+    temperature?: number;
+    maxTokens?: number;
+  };
+
+  /** Speech-to-Text (STT) configuration */
+  stt?: {
+    provider: string; // e.g., "deepgram", "assembly", "google"
+    model?: string; // e.g., "nova-2", "best"
+    language?: string;
+  };
+
+  /** Text-to-Speech (TTS) configuration */
+  tts?: {
+    provider: string; // e.g., "openai", "elevenlabs", "cartesia"
+    voice?: string; // e.g., "alloy", "shimmer"
+    speed?: number;
+  };
+
+  /** Additional custom configuration */
+  [key: string]: unknown;
+}
+
 export interface AgentJob {
   /** Job identifier */
   id: string;
@@ -74,8 +107,11 @@ export interface Agent {
   /** Participant SID if agent is in a room */
   participantSid?: string;
 
-  /** Agent metadata */
+  /** Agent metadata (raw string) */
   metadata?: string;
+
+  /** Parsed agent configuration from metadata */
+  config?: AgentConfiguration;
 
   /** Current job being processed */
   currentJob?: AgentJob;

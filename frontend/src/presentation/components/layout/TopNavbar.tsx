@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Activity, WifiOff, RefreshCw } from 'lucide-react';
+import { Settings, Activity, WifiOff, RefreshCw, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import type { ConnectionState } from '../../../types/sse';
@@ -10,6 +10,9 @@ interface TopNavbarProps {
   // Real-time connection props
   connectionState?: ConnectionState;
   onManualReconnect?: () => void;
+  // Mobile menu props
+  isMobile?: boolean;
+  onToggleMobileMenu?: () => void;
 }
 
 /**
@@ -21,6 +24,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   isRefreshing,
   connectionState = 'disconnected',
   onManualReconnect,
+  isMobile = false,
+  onToggleMobileMenu,
 }) => {
   const formatLastUpdated = (date?: Date) => {
     if (!date) return 'Never';
@@ -72,26 +77,25 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-6">
-        {/* Left: Brand */}
-        <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 border border-primary/20">
-              <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.31-0.78-6-4.42-6-8V8.3l6-3.11v14.81z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold leading-none">LiveKit</h1>
-              <p className="text-xs text-muted-foreground leading-none mt-0.5">Dashboard</p>
-            </div>
-          </Link>
+        {/* Left: Hamburger Menu (Mobile) */}
+        <div className="flex items-center gap-3">
+          {/* Mobile Hamburger Menu */}
+          {isMobile && onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="flex items-center justify-center h-9 w-9 rounded-md hover:bg-card-hover border border-transparent hover:border-border transition-all"
+              aria-label="Toggle menu"
+            >
+              <Menu className="h-5 w-5 text-foreground" />
+            </button>
+          )}
         </div>
 
         {/* Right: Global Controls */}
         <div className="flex items-center gap-3">
           {/* Live Status Indicator with SSE Connection State */}
           <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md bg-card border border-border ${
+            className={`flex items-center gap-2 px-2 md:px-3 py-1.5 rounded-md bg-card border border-border ${
               connectionState === 'error' ? 'cursor-pointer hover:bg-card-hover' : ''
             }`}
             onClick={connectionState === 'error' ? onManualReconnect : undefined}
@@ -119,7 +123,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 </span>
               )}
             </div>
-            <div className="flex flex-col">
+            {/* Hide status text on mobile, show only on medium screens and up */}
+            <div className="hidden md:flex flex-col">
               <span className="text-xs font-mono font-semibold leading-none">{status.label}</span>
               <span className="text-[10px] text-muted-foreground leading-none mt-0.5">
                 {formatLastUpdated(lastUpdated)}
