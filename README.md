@@ -19,13 +19,17 @@
 
 ## 🎬 Demo
 
-Watch LiveKit Dashboard in action - monitoring rooms, tracking participants, and displaying live AI agent transcriptions:
-
 <div align="center">
 
-[![LiveKit Dashboard Demo](https://img.youtube.com/vi/Cf5yiVFMWjk/0.jpg)](https://youtu.be/Cf5yiVFMWjk)
+### Watch LiveKit Dashboard in Action
 
-**[▶️ Watch 1-Minute Demo on YouTube](https://youtu.be/Cf5yiVFMWjk)**
+*Monitor rooms, track participants, and view live AI agent transcriptions in real-time*
+
+<br/>
+
+[![LiveKit Dashboard Demo - Click to Play](https://img.youtube.com/vi/Cf5yiVFMWjk/maxresdefault.jpg)](https://www.youtube.com/watch?v=Cf5yiVFMWjk "Click to watch: LiveKit Dashboard Demo - Real-Time AI Agent Monitoring")
+
+**[▶️ Watch Full Demo on YouTube](https://youtu.be/Cf5yiVFMWjk)** • 1 minute
 
 </div>
 
